@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createField, stepParticle, type Particle } from './flowfield'
+import { createField, stepParticle, attractParticle, type Attractor, type Particle } from './flowfield'
 
 describe('createField', () => {
   it('returns a deterministic angle for the same seed and inputs', () => {
@@ -45,5 +45,30 @@ describe('stepParticle', () => {
     const p = base()
     stepParticle(p, 0, opts)
     expect(p.life).toBe(99)
+  })
+})
+
+describe('attractParticle', () => {
+  const particle = (): Particle => ({ x: 50, y: 50, vx: 0, vy: 0, hue: 'neutral', life: 100 })
+
+  it('pulls the particle toward the attractor', () => {
+    const p = particle()
+    const a: Attractor = { x: 150, y: 50, radius: 300, strength: 1 }
+    attractParticle(p, a)
+    expect(p.vx).toBeGreaterThan(0) // attractor is to the right
+    expect(p.vy).toBeCloseTo(0, 5)
+  })
+
+  it('does nothing beyond the radius', () => {
+    const p = particle()
+    attractParticle(p, { x: 500, y: 50, radius: 100, strength: 1 })
+    expect(p.vx).toBe(0)
+    expect(p.vy).toBe(0)
+  })
+
+  it('does nothing at zero strength', () => {
+    const p = particle()
+    attractParticle(p, { x: 150, y: 50, radius: 300, strength: 0 })
+    expect(p.vx).toBe(0)
   })
 })

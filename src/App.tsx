@@ -1,5 +1,6 @@
 import { SmoothScroll } from './lib/scroll/SmoothScroll'
 import { FlowField } from './components/background/FlowFieldCanvas'
+import { useFieldDirector } from './lib/scroll/useFieldDirector'
 import { Nav } from './components/layout/Nav'
 import { Section } from './components/layout/Section'
 import { Hero } from './components/hero/Hero'
@@ -11,6 +12,7 @@ import { Stack } from './components/sections/Stack'
 import { Footer } from './components/layout/Footer'
 
 function App() {
+  useFieldDirector()
   return (
     <SmoothScroll>
       <FlowField />

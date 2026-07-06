@@ -70,3 +70,20 @@ export function stepParticle(p: Particle, angle: number, opts: StepOpts): void {
   if (p.y < 0) p.y += opts.height
   if (p.y >= opts.height) p.y -= opts.height
 }
+
+export type Attractor = { x: number; y: number; radius: number; strength: number }
+
+const ATTRACT_FORCE = 0.5
+
+/** Pulls a particle toward a screen-space attractor with linear falloff. */
+export function attractParticle(p: Particle, a: Attractor): void {
+  if (a.strength <= 0) return
+  const dx = a.x - p.x
+  const dy = a.y - p.y
+  const distSq = dx * dx + dy * dy
+  if (distSq < 1 || distSq > a.radius * a.radius) return
+  const dist = Math.sqrt(distSq)
+  const falloff = 1 - dist / a.radius
+  p.vx += (dx / dist) * falloff * ATTRACT_FORCE * a.strength
+  p.vy += (dy / dist) * falloff * ATTRACT_FORCE * a.strength
+}

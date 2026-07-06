@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { createField, stepParticle, type Particle } from './flowfield'
+import { createField, stepParticle, attractParticle, type Particle } from './flowfield'
+import { fieldState } from './fieldState'
 
 // Trail + particle colors (oklch is valid canvas fillStyle in all modern browsers)
 const FADE = 'oklch(0.09 0 0 / 0.07)' // bg at low alpha — leaves trails
 const NEUTRAL = 'oklch(0.68 0.01 355 / 0.35)'
 const BRAND = 'oklch(0.58 0.19 355 / 0.5)'
-const BRAND_RATIO = 0.14 // fraction of particles carrying the magenta
 
 function spawn(width: number, height: number, rand: () => number): Particle {
   return {
@@ -14,7 +14,7 @@ function spawn(width: number, height: number, rand: () => number): Particle {
     y: rand() * height,
     vx: 0,
     vy: 0,
-    hue: rand() < BRAND_RATIO ? 'brand' : 'neutral',
+    hue: rand() < fieldState.brandRatio ? 'brand' : 'neutral',
     life: 100 + Math.floor(rand() * 300),
   }
 }
@@ -70,12 +70,12 @@ export function FlowField() {
 
     const frame = () => {
       if (!running) return
-      t += 1 / 60
+      t += (1 / 60) * fieldState.turbulence
       ctx.fillStyle = FADE
       ctx.fillRect(0, 0, width, height)
 
       const opts = {
-        speed: 1,
+        speed: fieldState.speed,
         width,
         height,
         pointerX: pointer.x,
@@ -88,6 +88,7 @@ export function FlowField() {
         const prevY = p.y
         const angle = field(p.x, p.y, t)
         stepParticle(p, angle, opts)
+        attractParticle(p, fieldState.attractor)
         if (p.life <= 0) {
           Object.assign(p, spawn(width, height, Math.random))
           continue
