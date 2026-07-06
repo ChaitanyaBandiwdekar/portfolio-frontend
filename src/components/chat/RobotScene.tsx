@@ -1,37 +1,11 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { useEffect, useRef, useState } from 'react'
+import { Canvas } from '@react-three/fiber'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 import { Robot, pointerTarget, entrance } from './Robot'
-import { fieldState } from '../background/fieldState'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
-
-const projected = new Vector3()
-
-/**
- * Projects the robot's world origin to viewport pixels each frame and
- * exposes it as the flow field's attractor while the entrance is running.
- * Strength peaks mid-assembly (sin curve) and releases at both ends.
- */
-function AttractorTracker({ wrapper }: { wrapper: RefObject<HTMLDivElement | null> }) {
-  useFrame(({ camera }) => {
-    const p = entrance.progress
-    const strength = p > 0 && p < 1 ? Math.sin(Math.PI * p) : 0
-    fieldState.attractor.strength = strength
-    if (strength === 0) return
-    const el = wrapper.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    projected.set(0, 0, 0).project(camera)
-    fieldState.attractor.x = rect.left + ((projected.x + 1) / 2) * rect.width
-    fieldState.attractor.y = rect.top + ((1 - projected.y) / 2) * rect.height
-    fieldState.attractor.radius = 420
-  })
-  return null
-}
 
 export function RobotScene() {
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -111,7 +85,6 @@ export function RobotScene() {
         {/* magenta rim light from behind-left — ties the robot to the brand */}
         <pointLight position={[-3, 1, -2]} intensity={14} color="#c2185b" />
         <Robot reducedMotion={reducedMotion} />
-        <AttractorTracker wrapper={wrapRef} />
       </Canvas>
     </div>
   )

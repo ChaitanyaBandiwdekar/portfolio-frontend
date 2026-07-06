@@ -4,7 +4,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { site } from '../../data/site'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { fieldState } from '../background/fieldState'
 import { BootIntro } from './BootIntro'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
@@ -42,12 +41,6 @@ export function Hero() {
       }
       gsap.to(contentRef.current, { y: -40, opacity: 0, ease: 'none', scrollTrigger: st })
       gsap.to(headlineRef.current, { letterSpacing: '0.04em', ease: 'none', scrollTrigger: st })
-      // the headline "blows away": turbulence spikes then settles over the same range
-      gsap.to(fieldState, {
-        keyframes: [{ turbulence: 2.4 }, { turbulence: 1 }],
-        ease: 'none',
-        scrollTrigger: st,
-      })
     },
     { scope: rootRef, dependencies: [reducedMotion] },
   )
