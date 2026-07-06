@@ -1,14 +1,20 @@
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { site } from '../../data/site'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
+import { fieldState } from '../background/fieldState'
 import { BootIntro } from './BootIntro'
+
+gsap.registerPlugin(ScrollTrigger) // idempotent
 
 export function Hero() {
   const [booted, setBooted] = useState(false)
   const reducedMotion = usePrefersReducedMotion()
   const rootRef = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const headlineRef = useRef<HTMLHeadingElement>(null)
 
   useGSAP(
     () => {
@@ -24,14 +30,37 @@ export function Hero() {
     { scope: rootRef, dependencies: [booted, reducedMotion] },
   )
 
+  // hero exit dissolve: content drifts up and fades as the field turbulence spikes
+  useGSAP(
+    () => {
+      if (reducedMotion) return
+      const st = {
+        trigger: rootRef.current,
+        start: 'top top',
+        end: 'bottom 45%',
+        scrub: 0.8,
+      }
+      gsap.to(contentRef.current, { y: -40, opacity: 0, ease: 'none', scrollTrigger: st })
+      gsap.to(headlineRef.current, { letterSpacing: '0.04em', ease: 'none', scrollTrigger: st })
+      // the headline "blows away": turbulence spikes then settles over the same range
+      gsap.to(fieldState, {
+        keyframes: [{ turbulence: 2.4 }, { turbulence: 1 }],
+        ease: 'none',
+        scrollTrigger: st,
+      })
+    },
+    { scope: rootRef, dependencies: [reducedMotion] },
+  )
+
   return (
     <section id="hero" ref={rootRef} className="relative flex min-h-svh items-center">
       <BootIntro onDone={() => setBooted(true)} />
-      <div className="mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] pt-16">
+      <div ref={contentRef} className="mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] pt-16">
         <p data-hero-reveal className="mb-6 font-mono text-mono-sm text-muted">
           {site.location} · {site.status}
         </p>
         <h1
+          ref={headlineRef}
           data-hero-reveal
           className="max-w-[14ch] font-display text-display font-extrabold text-ink"
         >
