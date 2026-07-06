@@ -1,4 +1,5 @@
 import { site } from '../../data/site'
+import { LetterSwap } from '../ui/LetterSwap'
 
 export function Footer() {
   const year = new Date().getFullYear()
@@ -13,19 +14,19 @@ export function Footer() {
           <li>
             <span className="text-muted">email     </span>
             <a href={`mailto:${site.email}`} className="text-primary-bright hover:underline">
-              {site.email}
+              <LetterSwap label={site.email} />
             </a>
           </li>
           <li>
             <span className="text-muted">github    </span>
             <a href={site.github} target="_blank" rel="noreferrer" className="text-primary-bright hover:underline">
-              {site.github.replace('https://', '')} ↗
+              <LetterSwap label={site.github.replace('https://', '')} /> ↗
             </a>
           </li>
           <li>
             <span className="text-muted">linkedin  </span>
             <a href={site.linkedin} target="_blank" rel="noreferrer" className="text-primary-bright hover:underline">
-              {site.linkedin.replace('https://www.', '')} ↗
+              <LetterSwap label={site.linkedin.replace('https://www.', '')} /> ↗
             </a>
           </li>
         </ul>

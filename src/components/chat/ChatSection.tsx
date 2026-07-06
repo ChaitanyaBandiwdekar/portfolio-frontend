@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 import { RobotScene } from './RobotScene'
+import { StageSpotlight } from './StageSpotlight'
 import { Terminal } from './Terminal'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
@@ -35,7 +36,8 @@ export function ChatSection() {
 
   return (
     <div className="grid items-center gap-10 lg:grid-cols-[45fr_55fr]">
-      <div>
+      <div className="relative">
+        <StageSpotlight />
         <RobotScene />
         <p className="mt-2 text-center font-mono text-mono-sm text-muted">
           unit-01 · it knows things about me. ask it.

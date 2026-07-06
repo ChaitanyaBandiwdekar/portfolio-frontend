@@ -1,3 +1,5 @@
+import { LetterSwap } from '../ui/LetterSwap'
+
 const LINKS = [
   { href: '#about', label: 'about' },
   { href: '#chat', label: 'chat' },
@@ -18,7 +20,7 @@ export function Nav() {
         className="mx-auto flex max-w-[var(--container)] items-center justify-between px-[var(--gutter)] py-3"
       >
         <a href="#hero" className="font-mono text-mono-sm text-muted hover:text-ink">
-          ~/portfolio
+          <LetterSwap label="~/portfolio" />
         </a>
         <ul className="flex gap-5 max-sm:gap-3">
           {LINKS.map((link) => (
@@ -27,7 +29,7 @@ export function Nav() {
                 href={link.href}
                 className="font-mono text-mono-sm text-muted hover:text-primary-bright max-sm:text-[0.7rem]"
               >
-                {link.label}
+                <LetterSwap label={link.label} />
               </a>
             </li>
           ))}

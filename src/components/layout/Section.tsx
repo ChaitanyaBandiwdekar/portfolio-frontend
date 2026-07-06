@@ -2,10 +2,11 @@ import { useRef, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin'
 import { useGSAP } from '@gsap/react'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 
-gsap.registerPlugin(ScrollTrigger, SplitText) // idempotent
+gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin) // idempotent
 
 type SectionProps = {
   id: string
@@ -16,6 +17,7 @@ type SectionProps = {
 
 export function Section({ id, title, command, children }: SectionProps) {
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const commandRef = useRef<HTMLSpanElement>(null)
   const reducedMotion = usePrefersReducedMotion()
 
   useGSAP(
@@ -36,6 +38,22 @@ export function Section({ id, title, command, children }: SectionProps) {
           scrub: 0.5,
         },
       })
+      // command subline scrambles into place once, in sync with the heading reveal
+      if (command && commandRef.current) {
+        gsap.to(commandRef.current, {
+          scrambleText: {
+            text: command,
+            chars: '!<>-_\\/[]{}=+*^?#$%',
+            speed: 0.4,
+          },
+          duration: 1,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: 'top 75%',
+          },
+        })
+      }
       return () => split.revert()
     },
     { dependencies: [reducedMotion] },
@@ -54,7 +72,9 @@ export function Section({ id, title, command, children }: SectionProps) {
       </h2>
       {command && (
         <p className="mb-12 mt-2 font-mono text-mono-sm text-muted">
-          {command}
+          <span ref={commandRef} className="inline-block">
+            {command}
+          </span>
           <span className="cursor-blink" />
         </p>
       )}
