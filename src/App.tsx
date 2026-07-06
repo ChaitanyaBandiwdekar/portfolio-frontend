@@ -4,6 +4,10 @@ import { Nav } from './components/layout/Nav'
 import { Section } from './components/layout/Section'
 import { Hero } from './components/hero/Hero'
 import { ChatSection } from './components/chat/ChatSection'
+import { About } from './components/sections/About'
+import { Projects } from './components/sections/Projects'
+import { Experience } from './components/sections/Experience'
+import { Stack } from './components/sections/Stack'
 
 function App() {
   return (
@@ -13,19 +17,19 @@ function App() {
       <main>
         <Hero />
         <Section id="about" command="about --me">
-          <p className="max-w-[65ch] text-muted">about content (phase 5)</p>
+          <About />
         </Section>
         <Section id="chat" command="./chat --with robot">
           <ChatSection />
         </Section>
         <Section id="projects" command="ls -la ~/projects">
-          <p className="max-w-[65ch] text-muted">projects (phase 5)</p>
+          <Projects />
         </Section>
         <Section id="experience" command="git log --experience">
-          <p className="max-w-[65ch] text-muted">experience (phase 5)</p>
+          <Experience />
         </Section>
         <Section id="stack" command="cat stack.json">
-          <p className="max-w-[65ch] text-muted">tech stack (phase 5)</p>
+          <Stack />
         </Section>
       </main>
       <footer id="contact" className="border-t border-line">
