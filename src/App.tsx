@@ -1,10 +1,12 @@
 import { SmoothScroll } from './lib/scroll/SmoothScroll'
+import { FlowField } from './components/background/FlowFieldCanvas'
 import { Nav } from './components/layout/Nav'
 import { Section } from './components/layout/Section'
 
 function App() {
   return (
     <SmoothScroll>
+      <FlowField />
       <Nav />
       <main>
         <Section id="hero">
