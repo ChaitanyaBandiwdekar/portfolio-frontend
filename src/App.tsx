@@ -8,6 +8,7 @@ import { About } from './components/sections/About'
 import { Projects } from './components/sections/Projects'
 import { Experience } from './components/sections/Experience'
 import { Stack } from './components/sections/Stack'
+import { Footer } from './components/layout/Footer'
 
 function App() {
   return (
@@ -32,11 +33,7 @@ function App() {
           <Stack />
         </Section>
       </main>
-      <footer id="contact" className="border-t border-line">
-        <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] py-16">
-          <p className="font-mono text-mono-sm text-muted">footer (phase 6)</p>
-        </div>
-      </footer>
+      <Footer />
     </SmoothScroll>
   )
 }
