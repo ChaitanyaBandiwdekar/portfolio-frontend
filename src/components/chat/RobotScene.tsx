@@ -76,7 +76,7 @@ export function RobotScene() {
       />
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, 0, 3.4], fov: 40 }}
+        camera={{ position: [0, -0.1, 3.6], fov: 42 }}
         frameloop={inView ? 'always' : 'never'}
         gl={{ antialias: true, alpha: true }}
       >

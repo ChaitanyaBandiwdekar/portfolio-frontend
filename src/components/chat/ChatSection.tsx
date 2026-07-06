@@ -35,15 +35,12 @@ export function ChatSection() {
   )
 
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-[45fr_55fr]">
-      <div className="relative">
+    <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,7fr)] max-lg:relative max-lg:pt-40">
+      <div className="relative max-lg:absolute max-lg:inset-x-0 max-lg:top-0 max-lg:z-0">
         <StageSpotlight />
         <RobotScene />
-        <p className="mt-2 text-center font-mono text-mono-sm text-muted">
-          unit-01 · it knows things about me. ask it.
-        </p>
       </div>
-      <div className="relative">
+      <div className="relative max-lg:z-10">
         <div ref={termWrapRef}>
           <Terminal />
         </div>
