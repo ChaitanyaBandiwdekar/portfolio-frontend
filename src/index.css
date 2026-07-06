@@ -1,111 +1,128 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/martian-mono';
+@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource-variable/jetbrains-mono';
+
+@theme {
+  /* Wipe Tailwind's default palette — tokens only (see DESIGN.md) */
+  --color-*: initial;
+
+  /* Stage */
+  --color-bg: oklch(0.09 0 0);
+  --color-surface: oklch(0.14 0.004 355);
+  --color-surface-2: oklch(0.18 0.006 355);
+  --color-line: oklch(0.26 0.008 355);
+
+  /* Text */
+  --color-ink: oklch(0.93 0.004 355);
+  --color-muted: oklch(0.68 0.01 355);
+
+  /* Brand spotlight */
+  --color-primary: oklch(0.58 0.19 355);
+  --color-primary-bright: oklch(0.74 0.15 355);
+  --color-primary-dim: oklch(0.32 0.1 355);
+
+  /* Terminal semantics ONLY — never outside terminal/code contexts */
+  --color-term-green: oklch(0.8 0.14 150);
+  --color-term-amber: oklch(0.82 0.12 80);
+  --color-term-red: oklch(0.68 0.17 25);
+
+  /* Type */
+  --font-display: 'Martian Mono Variable', ui-monospace, monospace;
+  --font-body: 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --text-display: clamp(2.5rem, 1.2rem + 5.5vw, 5.5rem);
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-h2: clamp(1.75rem, 1rem + 2.8vw, 3rem);
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h3: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+  --text-h3--line-height: 1.35;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.75;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.65;
+  --text-mono: 0.9375rem;
+  --text-mono--line-height: 1.7;
+  --text-mono-sm: 0.8125rem;
+  --text-mono-sm--line-height: 1.6;
+
+  /* Layout */
+  --radius-window: 12px;
+  --radius-control: 6px;
+}
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Non-Tailwind layout vars (use as arbitrary values or plain CSS) */
+  --space-section: clamp(6rem, 4rem + 8vw, 11rem);
+  --container: 72rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Semantic z-index scale */
+  --z-canvas: -1;
+  --z-base: 0;
+  --z-nav: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    scroll-behavior: smooth;
+  }
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-bright);
+    outline-offset: 2px;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+@layer utilities {
+  /* Blinking block cursor — steps(1), terminal-authentic */
+  .cursor-blink::after {
+    content: '';
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    margin-left: 0.15em;
+    vertical-align: text-bottom;
+    background-color: var(--color-term-green);
+    animation: blink 1.1s steps(1) infinite;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  @keyframes blink {
+    50% { opacity: 0; }
   }
-}
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-blink::after { animation: none; }
   }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }
