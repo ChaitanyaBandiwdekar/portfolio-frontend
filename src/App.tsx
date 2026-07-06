@@ -3,6 +3,7 @@ import { FlowField } from './components/background/FlowFieldCanvas'
 import { Nav } from './components/layout/Nav'
 import { Section } from './components/layout/Section'
 import { Hero } from './components/hero/Hero'
+import { ChatSection } from './components/chat/ChatSection'
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
           <p className="max-w-[65ch] text-muted">about content (phase 5)</p>
         </Section>
         <Section id="chat" command="./chat --with robot">
-          <p className="max-w-[65ch] text-muted">chatbot + robot (phase 4)</p>
+          <ChatSection />
         </Section>
         <Section id="projects" command="ls -la ~/projects">
           <p className="max-w-[65ch] text-muted">projects (phase 5)</p>
