@@ -1,77 +1,27 @@
-# React + TypeScript + Vite
+# portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal portfolio. Dark, terminal-native, deliberately over-engineered in the fun places:
+a cursor-tracking three.js robot, a seeded curl-noise particle field, and a terminal that
+streams from a RAG backend over SSE.
 
-Currently, two official plugins are available:
+## develop
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+    npm install
+    npm run dev
 
-## React Compiler
+## configure
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| env var             | effect                                                              |
+| ------------------- | ------------------------------------------------------------------- |
+| `VITE_CHAT_API_URL` | chat backend base URL. Unset → built-in mock client (fully demoable) |
 
-Note: This will impact Vite dev & build performances.
+Chat backend contract: see `plans/00-overview.md` → "Chat backend API contract".
 
-## Expanding the ESLint configuration
+## content
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+All personal content lives in `src/data/*.ts` — search for `TODO(owner)`.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## deploy
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+Netlify. `netlify.toml` is configured; connect the repo, done. Set `VITE_CHAT_API_URL`
+in Netlify env settings when the backend exists.
