@@ -81,7 +81,6 @@
   }
 
   body {
-    background-color: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-body);
     font-size: var(--text-body);
