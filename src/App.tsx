@@ -17,19 +17,19 @@ function App() {
       <Nav />
       <main>
         <Hero />
-        <Section id="about" command="about --me">
+        <Section id="about" title="A Bit About Me" command="about --me">
           <About />
         </Section>
-        <Section id="chat" command="./chat --with robot">
+        <Section id="chat" title="Ask Me Anything" command="./chat --with robot">
           <ChatSection />
         </Section>
-        <Section id="projects" command="ls -la ~/projects">
+        <Section id="projects" title="What I've Built" command="ls -la ~/projects">
           <Projects />
         </Section>
-        <Section id="experience" command="git log --experience">
+        <Section id="experience" title="Experience" command="git log --experience">
           <Experience />
         </Section>
-        <Section id="stack" command="cat stack.json">
+        <Section id="stack" title="Toolkit" command="cat stack.json">
           <Stack />
         </Section>
       </main>

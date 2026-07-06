@@ -10,7 +10,7 @@ export function Stack() {
   return (
     <div ref={ref} className="max-w-3xl">
       <div data-reveal>
-        <TerminalWindow title="guest@portfolio: ~ — cat stack.json">
+        <TerminalWindow title="chaitbot: ~ — cat stack.json">
           <pre className="overflow-x-auto px-5 py-4 font-mono text-mono leading-[1.9]">
             <code>
               <span className="text-muted">{'{'}</span>

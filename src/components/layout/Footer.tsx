@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] py-16">
         <h2 className="font-display text-h2 font-semibold text-ink">ping me</h2>
         <p className="mt-3 max-w-[46ch] text-body text-muted">
-          No contact form. Forms are where messages go to die — email works.
+          If the AI above didn't answer it, I probably can.
         </p>
         <ul className="mt-8 space-y-2 font-mono text-mono">
           <li>

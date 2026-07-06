@@ -9,11 +9,12 @@ gsap.registerPlugin(ScrollTrigger, SplitText) // idempotent
 
 type SectionProps = {
   id: string
+  title: string
   command?: string
   children: ReactNode
 }
 
-export function Section({ id, command, children }: SectionProps) {
+export function Section({ id, title, command, children }: SectionProps) {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const reducedMotion = usePrefersReducedMotion()
 
@@ -45,10 +46,17 @@ export function Section({ id, command, children }: SectionProps) {
       id={id}
       className="mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] py-[calc(var(--space-section)/2)] scroll-mt-24"
     >
+      <h2
+        ref={headingRef}
+        className={`font-display text-h2 font-semibold text-ink${command ? '' : ' mb-12'}`}
+      >
+        {title}
+      </h2>
       {command && (
-        <h2 ref={headingRef} className="font-display text-h2 font-semibold text-ink mb-12">
+        <p className="mb-12 mt-2 font-mono text-mono-sm text-muted">
           {command}
-        </h2>
+          <span className="cursor-blink" />
+        </p>
       )}
       {children}
     </section>

@@ -10,9 +10,15 @@ type Entry =
   | { id: number; kind: 'bot'; text: string; streaming: boolean }
 
 const GREETING: Entry[] = [
-  { id: 0, kind: 'output', text: 'connected to portfolio-agent v1. type `help` for commands,' },
-  { id: 1, kind: 'output', text: 'or just ask something. i have read all the documents. all of them.' },
+  { id: 0, kind: 'output', text: 'chaitbot v0.0.1 — an agent for chaitanya. type `help` for commands,' },
+  {
+    id: 1,
+    kind: 'output',
+    text: 'or just ask about projects, architecture, or tech stacks. i have read all the documents. all of them.',
+  },
 ]
+
+const SUGGESTIONS = ['tell me about your work', 'what is your favourite food and why is it biryani?']
 
 let nextId = 2
 
@@ -35,8 +41,8 @@ export function Terminal() {
   const append = (entry: Omit<Entry, 'id'>) =>
     setEntries((prev) => [...prev, { ...entry, id: nextId++ } as Entry])
 
-  const submit = async () => {
-    const text = input.trim()
+  const submit = async (chipText?: string) => {
+    const text = (chipText ?? input).trim()
     if (!text || busy) return
     setInput('')
     setHistory((prev) => [text, ...prev].slice(0, 50))
@@ -82,8 +88,10 @@ export function Terminal() {
     }
   }
 
+  const hasSubmitted = entries.some((entry) => entry.kind === 'input')
+
   return (
-    <TerminalWindow title="guest@portfolio: ~/chat">
+    <TerminalWindow title="chaitbot: ~/chat">
       {/* click anywhere in the terminal focuses the input, like a real terminal;
           keyboard users reach the input directly via Tab, so no key handler needed here */}
       <div onClick={() => inputRef.current?.focus()}>
@@ -112,6 +120,21 @@ export function Terminal() {
             </p>
           ))}
         </div>
+        {!hasSubmitted && (
+          <div className="flex flex-wrap gap-2 border-t border-line px-4 py-3">
+            {SUGGESTIONS.map((suggestion) => (
+              <button
+                key={suggestion}
+                type="button"
+                disabled={busy}
+                onClick={() => void submit(suggestion)}
+                className="rounded border border-line px-2 py-1 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        )}
         <form
           className="flex items-center gap-2 border-t border-line px-4 py-3"
           onSubmit={(e) => {
@@ -149,6 +172,9 @@ export function Terminal() {
             style={{ caretColor: 'var(--color-term-green)' }}
           />
         </form>
+        <p className="border-t border-line px-4 py-2 font-mono text-mono-sm text-muted">
+          v0.0.1 · model: gpt-4.1 (that's what i could afford)
+        </p>
       </div>
     </TerminalWindow>
   )
