@@ -1,25 +1,45 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import type { Group, Mesh } from 'three'
+import type { Group, Mesh, MeshStandardMaterial } from 'three'
 
 /** Normalized pointer (-1..1) shared via module scope; written by RobotScene's window listener. */
 // eslint-disable-next-line react-refresh/only-export-components -- shared mutable state, not a component
 export const pointerTarget = { x: 0, y: 0, active: false }
+
+/** Scroll-scrubbed assembly progress, written by RobotScene's ScrollTrigger. */
+// eslint-disable-next-line react-refresh/only-export-components -- shared mutable state, not a component
+export const entrance = { progress: 1 }
 
 const HEAD_YAW_RANGE = 0.55 // radians
 const HEAD_PITCH_RANGE = 0.3
 const DAMP = 0.06
 
 export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
+  const entranceGroup = useRef<Group>(null)
   const root = useRef<Group>(null)
   const head = useRef<Group>(null)
   const leftEye = useRef<Mesh>(null)
   const rightEye = useRef<Mesh>(null)
+  const chest = useRef<Mesh>(null)
+  const eyeLine = useRef<Mesh>(null)
   const nextBlink = useRef(2.5)
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
     if (!root.current || !head.current) return
+
+    const p = entrance.progress
+    if (entranceGroup.current) {
+      entranceGroup.current.position.y = (1 - p) * -2.4 // rises from below the frame
+      entranceGroup.current.rotation.y = (1 - p) * Math.PI // back-facing → front-facing
+    }
+    const setEmissive = (mesh: Mesh | null, full: number) => {
+      if (mesh) (mesh.material as MeshStandardMaterial).emissiveIntensity = full * p
+    }
+    setEmissive(leftEye.current, 2.2)
+    setEmissive(rightEye.current, 2.2)
+    setEmissive(eyeLine.current, 1.4)
+    setEmissive(chest.current, 1.6)
 
     // idle bob + breathing (kept under reduced motion — it's gentle and non-interactive)
     root.current.position.y = Math.sin(t * 1.2) * 0.06 - 0.1
@@ -37,6 +57,8 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
         targetPitch = Math.sin(t * 0.22) * 0.1
       }
     }
+    targetYaw *= p
+    targetPitch *= p
     head.current.rotation.y += (targetYaw - head.current.rotation.y) * DAMP
     head.current.rotation.x += (targetPitch - head.current.rotation.x) * DAMP
     // torso follows the head a little — feels alive, not mechanical
@@ -56,6 +78,7 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
   })
 
   return (
+    <group ref={entranceGroup}>
     <group ref={root}>
       {/* torso */}
       <mesh position={[0, -0.55, 0]}>
@@ -72,7 +95,7 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
         <meshStandardMaterial color="#e8e6e7" roughness={0.55} metalness={0.05} />
       </mesh>
       {/* chest light — the one brand-colored detail on the body */}
-      <mesh position={[0, -0.35, 0.52]}>
+      <mesh ref={chest} position={[0, -0.35, 0.52]}>
         <sphereGeometry args={[0.07, 16, 16]} />
         <meshStandardMaterial
           color="#3d0f26"
@@ -101,11 +124,12 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
           <sphereGeometry args={[0.045, 16, 16]} />
           <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={2.2} />
         </mesh>
-        <mesh position={[0, 0.04, 0.71]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh ref={eyeLine} position={[0, 0.04, 0.71]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.008, 0.008, 0.34, 8]} />
           <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1.4} />
         </mesh>
       </group>
+    </group>
     </group>
   )
 }
