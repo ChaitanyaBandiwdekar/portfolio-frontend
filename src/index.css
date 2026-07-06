@@ -136,4 +136,19 @@
   @media (prefers-reduced-motion: reduce) {
     .animate-bounce-slow { animation: none; }
   }
+
+  .expandable {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .expandable[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+  .expandable > div {
+    overflow: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .expandable { transition: none; }
+  }
 }
