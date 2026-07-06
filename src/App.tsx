@@ -2,6 +2,7 @@ import { SmoothScroll } from './lib/scroll/SmoothScroll'
 import { FlowField } from './components/background/FlowFieldCanvas'
 import { Nav } from './components/layout/Nav'
 import { Section } from './components/layout/Section'
+import { Hero } from './components/hero/Hero'
 
 function App() {
   return (
@@ -9,13 +10,7 @@ function App() {
       <FlowField />
       <Nav />
       <main>
-        <Section id="hero">
-          <div className="flex min-h-svh items-center">
-            <h1 className="font-display text-display font-extrabold">
-              hero goes here
-            </h1>
-          </div>
-        </Section>
+        <Hero />
         <Section id="about" command="about --me">
           <p className="max-w-[65ch] text-muted">about content (phase 5)</p>
         </Section>

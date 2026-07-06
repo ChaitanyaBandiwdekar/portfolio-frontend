@@ -125,4 +125,15 @@
   @media (prefers-reduced-motion: reduce) {
     .cursor-blink::after { animation: none; }
   }
+
+  @keyframes bob {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 6px); }
+  }
+  .animate-bounce-slow {
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-bounce-slow { animation: none; }
+  }
 }
