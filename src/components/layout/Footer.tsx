@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer id="contact" className="border-t border-line">
       <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] py-16">
-        <h2 className="font-display text-h2 font-semibold text-ink">ping me</h2>
+        <h3 className="font-display text-h3 font-semibold text-ink">ping me</h3>
         <p className="mt-3 max-w-[46ch] text-body text-muted">
           If the AI above didn't answer it, I probably can.
         </p>
