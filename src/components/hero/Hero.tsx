@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react'
 import { site } from '../../data/site'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 import { BootIntro } from './BootIntro'
+import heroImg from '../../assets/hero.png'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
 
@@ -14,6 +15,7 @@ export function Hero() {
   const rootRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const headlineRef = useRef<HTMLHeadingElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
@@ -41,14 +43,46 @@ export function Hero() {
       }
       gsap.to(contentRef.current, { y: -40, opacity: 0, ease: 'none', scrollTrigger: st })
       gsap.to(headlineRef.current, { letterSpacing: '0.04em', ease: 'none', scrollTrigger: st })
+      gsap.to(imageRef.current, { y: -20, opacity: 0, ease: 'none', scrollTrigger: st })
     },
     { scope: rootRef, dependencies: [reducedMotion] },
   )
 
   return (
-    <section id="hero" ref={rootRef} className="relative flex min-h-svh items-center">
+    <section id="hero" ref={rootRef} className="relative flex min-h-svh items-center overflow-hidden">
       <BootIntro onDone={() => setBooted(true)} />
-      <div ref={contentRef} className="mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] pt-16">
+      <div ref={imageRef} data-hero-reveal aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
+        {/* mobile: dim ambient wash, kept behind the text rather than a second fold */}
+        <div className="absolute inset-0 md:hidden">
+          <img
+            src={heroImg}
+            alt=""
+            className="h-full w-full object-cover opacity-15"
+            style={{ filter: 'saturate(0.85) brightness(0.85) contrast(1.05)' }}
+          />
+          <div className="absolute inset-0 bg-bg/70" />
+        </div>
+        {/* desktop: full-bleed on the right, dissolving into the stage on its left edge */}
+        <div
+          className="absolute inset-y-0 right-0 hidden w-[60%] md:block"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 0%, black 42%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 42%)',
+          }}
+        >
+          <img
+            src={heroImg}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{ filter: 'saturate(0.85) brightness(0.85) contrast(1.05)' }}
+          />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-bg to-transparent" />
+        </div>
+      </div>
+      <div
+        ref={contentRef}
+        className="relative z-10 mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] pt-16"
+      >
         <p data-hero-reveal className="mb-6 font-mono text-mono-sm text-muted">
           {site.location} · {site.status}
         </p>
@@ -69,7 +103,7 @@ export function Hero() {
       <a
         href="#about"
         data-hero-reveal
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
       >
         scroll ↓
       </a>

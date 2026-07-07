@@ -1,0 +1,656 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/lenis@1.3.23/dist/lenis.css">
+<script src="https://unpkg.com/lenis@1.3.23/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b4cdb8",
+                        "surface-container-high": "#e9e8e4",
+                        "outline": "#737973",
+                        "on-tertiary-fixed": "#251a00",
+                        "surface-variant": "#e3e2df",
+                        "surface-tint": "#4d6453",
+                        "primary": "#061b0e",
+                        "error": "#ba1a1a",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e3e2df",
+                        "on-tertiary-container": "#af8e3a",
+                        "inverse-primary": "#b4cdb8",
+                        "on-primary-fixed": "#0b2013",
+                        "tertiary": "#1f1500",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#efeeea",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#1b3022",
+                        "secondary-fixed": "#ffdbd1",
+                        "secondary-container": "#fe8763",
+                        "primary-fixed": "#d0e9d4",
+                        "on-secondary-container": "#732004",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-primary-container": "#819986",
+                        "surface-bright": "#faf9f5",
+                        "secondary-fixed-dim": "#ffb59f",
+                        "outline-variant": "#c3c8c1",
+                        "surface": "#faf9f5",
+                        "on-secondary-fixed": "#3a0a00",
+                        "on-tertiary-fixed-variant": "#5a4400",
+                        "inverse-surface": "#2f312e",
+                        "error-container": "#ffdad6",
+                        "background": "#faf9f5",
+                        "tertiary-container": "#382900",
+                        "on-secondary-fixed-variant": "#80290c",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f4f4f0",
+                        "on-surface-variant": "#434843",
+                        "on-primary-fixed-variant": "#364c3c",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdf96",
+                        "tertiary-fixed-dim": "#e7c268",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1b1c1a",
+                        "secondary": "#a04022",
+                        "surface-dim": "#dbdad6",
+                        "accent-coral": "#E07A5F",
+                        "accent-mustard": "#e7c268"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "none": "0px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "section-gap": "120px",
+                        "margin-edge": "40px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "quote": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-lg": ["Montserrat"],
+                        "label-mono": ["Space Mono"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["84px", { "lineHeight": "90px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "quote": ["24px", { "lineHeight": "34px", "fontStyle": "italic" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    }catch(_e){}</script>
+<style>
+  /* editorial-grid: 12-col grid used across sections. Was referenced but never
+     defined, which was the root cause of the hero layout collapsing/glitching. */
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (min-width: 768px) {
+    .editorial-grid {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 32px;
+    }
+  }
+  .hairline { border: 1px solid #c3c8c1; }
+  .hairline-t { border-top: 1px solid #c3c8c1; }
+  .hairline-b { border-bottom: 1px solid #c3c8c1; }
+  .hairline-l { border-left: 1px solid #c3c8c1; }
+  .full-width { width: 100%; }
+  .docked { position: sticky; }
+
+  .terminal-scroll::-webkit-scrollbar { width: 6px; }
+  .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+  .terminal-scroll::-webkit-scrollbar-thumb { background: #b4cdb8; }
+  .terminal-scroll { scrollbar-width: thin; scrollbar-color: #b4cdb8 transparent; }
+
+  /* Reveal elements start hidden only if JS + motion are both available.
+     GSAP now owns all opacity/transform animation directly - see script below.
+     If JS fails to load at all, the noscript block further down forces
+     visibility so content is never stuck invisible. */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .reveal, .js .reveal-left, .js .reveal-card, .js .reveal-stamp {
+      opacity: 0;
+    }
+  }
+</style>
+<script>document.documentElement.classList.add('js');</script>
+<noscript>
+  <style>
+    .reveal, .reveal-left, .reveal-card, .reveal-stamp { opacity: 1 !important; transform: none !important; }
+  </style>
+</noscript>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    gsap.registerPlugin(ScrollTrigger);
+
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      gsap.set('.reveal, .reveal-left, .reveal-card, .reveal-stamp', { opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 });
+      // Still allow native anchor scrolling; skip Lenis physics + all scrub/parallax.
+      return;
+    }
+
+    // --- Lenis smooth scroll, synced to GSAP's ticker so ScrollTrigger and
+    // Lenis agree on scroll position every frame instead of drifting apart ---
+    var lenis = new Lenis({
+      lerp: 0.1,
+      wheelMultiplier: 1,
+      anchors: true
+    });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+
+    // --- Standard reveals: fade + slide up, scrubbed to scroll so they feel
+    // continuous rather than an on/off toggle ---
+    gsap.utils.toArray('.reveal').forEach(function (el, i) {
+      gsap.fromTo(el,
+        { opacity: 0, y: 28 },
+        {
+          opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
+          delay: (i % 4) * 0.06,
+          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+        }
+      );
+    });
+
+    // --- Timeline entries: slide in from the left ---
+    gsap.utils.toArray('.reveal-left').forEach(function (el) {
+      gsap.fromTo(el,
+        { opacity: 0, x: -36 },
+        {
+          opacity: 1, x: 0, duration: 0.7, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+        }
+      );
+    });
+
+    // --- Toolkit cards: stamp-press settle ---
+    gsap.utils.toArray('.reveal-stamp').forEach(function (el, i) {
+      gsap.fromTo(el,
+        { opacity: 0, scale: 0.7, rotate: -6 },
+        {
+          opacity: 1, scale: 1, rotate: 0, duration: 0.5, ease: 'back.out(1.7)',
+          delay: (i % 4) * 0.06,
+          scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
+        }
+      );
+    });
+
+    // --- Hero code card: settle-in on load, then a continuous, subtle
+    // scroll-scrubbed parallax + extra rotation as the signature "wow" moment ---
+    var heroCard = document.querySelector('.reveal-card');
+    if (heroCard) {
+      gsap.fromTo(heroCard,
+        { opacity: 0, y: 40, rotate: 8, scale: 0.94 },
+        { opacity: 1, y: 0, rotate: 2, scale: 1, duration: 0.9, ease: 'back.out(1.4)', delay: 0.2 }
+      );
+      gsap.to(heroCard, {
+        y: -60,
+        rotate: -3,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 0.6
+        }
+      });
+    }
+
+    // --- Header shadow/blur on scroll ---
+    var header = document.getElementById('site-header');
+    ScrollTrigger.create({
+      start: 'top -40',
+      end: 99999,
+      onUpdate: function (self) {
+        if (!header) return;
+        if (self.scroll() > 40) {
+          header.style.boxShadow = '0 1px 0 0 rgba(6,27,14,0.08)';
+          header.style.backdropFilter = 'blur(8px)';
+        } else {
+          header.style.boxShadow = 'none';
+          header.style.backdropFilter = 'none';
+        }
+      }
+    });
+
+    // --- Scroll progress bar ---
+    var progressBar = document.getElementById('scroll-progress');
+    if (progressBar) {
+      gsap.to(progressBar, {
+        width: '100%',
+        ease: 'none',
+        scrollTrigger: { start: 0, end: 'max', scrub: 0.3 }
+      });
+    }
+  });
+</script>
+</head><body class="font-body-md text-primary antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- Scroll progress indicator -->
+<div id="scroll-progress" class="fixed top-0 left-0 h-[3px] bg-accent-coral z-[60] transition-[width] duration-150 ease-out" style="width: 0%;"></div>
+<!-- TopNavBar (Shared Component) -->
+<header id="site-header" class="bg-background/95 dark:bg-background docked full-width top-0 border-b border-primary/10 dark:border-primary-fixed-dim/10 flat no shadows relative z-50 transition-shadow duration-300">
+<div class="flex justify-between items-center w-full px-margin-edge py-6 max-w-container-max mx-auto">
+<a class="font-display-lg text-headline-md italic text-primary dark:text-primary-fixed-dim text-lg" href="#">CB</a>
+<nav class="hidden md:flex gap-8">
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 font-label-mono text-label-mono uppercase tracking-widest" href="#hero">Home</a>
+<a class="text-outline dark:text-outline-variant font-label-mono text-label-mono hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 uppercase tracking-widest" href="#works">Projects</a>
+<a class="text-outline dark:text-outline-variant font-label-mono text-label-mono hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 uppercase tracking-widest" href="#experience" data-stitch-orig-opacity="0">Experience</a>
+<a class="text-outline dark:text-outline-variant font-label-mono text-label-mono hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 uppercase tracking-widest" href="#toolkit">Toolkit</a><a class="text-outline dark:text-outline-variant font-label-mono text-label-mono hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-300 uppercase tracking-widest" href="#about">About</a>
+</nav>
+<a class="hidden md:inline-flex hairline px-4 py-2 font-label-mono text-label-mono uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-colors duration-300" href="#contact">Connect</a>
+<button class="md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-edge">
+<!-- Hero Section -->
+<section class="pt-section-gap pb-section-gap relative" id="hero">
+<div class="editorial-grid md:items-center">
+<!-- Main Content (Spans left side) -->
+<div class="col-span-4 md:col-span-7 flex flex-col items-start justify-center z-10 relative">
+<p class="reveal font-label-mono text-[14px] font-bold text-primary mb-6 uppercase tracking-widest border-l-2 border-accent-coral pl-2">
+                        AUTHOR: [CHAITANYA BANDIWDEKAR]
+                    </p>
+<h1 class="reveal font-display-lg text-headline-lg-mobile md:text-display-lg text-primary mb-8 leading-tight">Works on localhost.<br class=""><span class="block mt-2 text-headline-md md:text-[40px] italic text-accent-mustard font-display-lg">Ask me about the other four environments.</span></h1>
+<p class="reveal font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-12">
+                        Full-stack developer, part-time editor of AI-written code.
+                    </p>
+<div class="reveal flex items-center gap-2 font-label-mono text-label-mono text-primary hairline px-3 py-1 bg-surface-container-low">
+<span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
+                        STATUS: DEPLOYED (hopefully)</div>
+</div>
+<!-- Marginalia / Asymmetric Graphic (Spans right side) -->
+<div class="col-span-4 md:col-span-5 relative mt-16 md:mt-0 flex flex-col items-center md:items-end justify-center">
+<!-- Tilted Code Card -->
+<div class="reveal-card relative w-full max-w-sm">
+  <!-- Main Paper Container -->
+  <div class="bg-background border-2 border-primary p-8 shadow-[4px_4px_0_0_#1b3022] relative">
+    <!-- Window Controls (Hand-drawn style) -->
+    <div class="flex gap-3 mb-6">
+      <div class="w-3 h-3 rounded-full border-2 border-primary"></div>
+      <div class="w-3 h-3 rounded-full border-2 border-primary"></div>
+      <div class="w-3 h-3 rounded-full border-2 border-primary"></div>
+    </div>
+    
+    <!-- Divider Line -->
+    <div class="border-b-2 border-primary mb-6"></div>
+
+    <!-- Code Content -->
+    <pre class="font-label-mono text-[12px] leading-relaxed text-primary whitespace-pre-wrap">const deploy = async (env) =&gt; {
+  try {
+    console.log(`Target: ${env}`);
+    await buildPipeline();
+    // Hope for the best
+    return { status: 'success' };
+  } catch (e) {
+    throw new Error('Not my machine');
+  }
+};</pre>
+
+    <!-- FIG Tag (Yellow/Gold Taped Style) -->
+    <div class="absolute -top-4 -right-4 bg-accent-mustard border-2 border-primary px-3 py-1 shadow-[2px_2px_0_0_#1b3022] z-20">
+      <div class="font-label-mono text-[10px] font-bold text-primary leading-none">FIG.</div>
+      <div class="font-label-mono text-[10px] text-primary text-center">1</div>
+    </div>
+  </div>
+
+  <!-- Footnote with Arrow -->
+  <div class="mt-6 flex items-start gap-2">
+    <span class="material-symbols-outlined text-primary rotate-180">south_east</span>
+    <p class="font-label-mono text-[12px] text-outline italic">
+      * Actual results may vary in production.
+    </p>
+  </div>
+</div>
+</div>
+</div>
+<!-- Section Divider -->
+<div class="mt-section-gap w-full hairline-t relative">
+<span class="absolute right-0 top-1/2 -translate-y-1/2 bg-background px-4 font-label-mono text-label-mono text-outline uppercase tracking-widest">
+                    Scroll [↓]
+                </span>
+</div>
+</section>
+<!-- About Section -->
+<section class="relative pt-section-gap pb-section-gap" id="about"><div class="editorial-grid">
+<!-- Marginalia Column -->
+
+<!-- Main Content -->
+<div class="col-span-4 md:col-span-10 max-w-2xl">
+<div class="reveal font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">01 / Tldr</div><h2 class="reveal font-headline-md text-headline-lg-mobile text-primary mb-6">
+                        A Bit About Me
+                    </h2>
+<div class="prose prose-lg max-w-none font-body-md text-[14px] text-on-surface-variant leading-relaxed">
+<p class="reveal font-claude-response-body break-words whitespace-normal">I build systems, end to end. Frontend, backend, whatever infrastructure sits underneath. Ideally nobody ever has to think about the stuff I build. That's usually the goal.</p>
+<p class="reveal font-claude-response-body break-words whitespace-normal">Lately I've been deep into agents. Not chatbots, actual systems that can retrieve information, reason through it, and act on their own. There's a lot of unglamorous work that goes into making that actually reliable.</p>
+<p class="reveal font-claude-response-body break-words whitespace-normal">Same curiosity either way - I've just always liked knowing what's actually happening underneath, not just that something works.</p>
+<div class="mt-12 pt-4 border-t border-outline-variant/30 flex justify-between items-center"><span class="font-label-mono text-[10px] uppercase tracking-widest text-outline">End of Entry</span></div></div>
+</div><div class="hidden md:block col-span-2 relative">
+<div class="relative h-full">
+
+<div class="pl-4 border-l border-dashed border-outline-variant absolute bottom-0 right-0 max-w-[240px] text-left">
+<span class="material-symbols-outlined text-outline block mb-2">attachment</span>
+<p class="font-label-mono text-[10px] text-outline">
+                                REF: Chaitanya.MD<br>
+                                DATE: 02/07/2026<br>(DD/MM/YYYY is the best date format, fight me)&nbsp;</p>
+</div>
+</div>
+</div>
+</div></section><section class="pt-section-gap pb-section-gap relative" id="chat"><div class="mb-12 flex flex-col items-start hairline-b pb-4">
+<div class="reveal font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">02 / Terminal</div>
+</div>
+<div class="editorial-grid">
+<div class="col-span-4 md:col-span-12">
+<div class="reveal bg-primary-container hairline shadow-[8px_8px_0_0_#1b3022] flex flex-col overflow-hidden font-label-mono">
+  <!-- Terminal Header Bar -->
+  <div class="bg-primary border-b border-outline-variant/30 px-4 py-2 flex items-center justify-between">
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-error/80"></div>
+      <div class="w-3 h-3 rounded-full bg-accent-mustard/80"></div>
+      <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+    </div>
+    <div class="text-[10px] text-primary-fixed-dim/50 uppercase tracking-widest">chaitbot:~zsh:80x24</div>
+    <div class="w-12"></div>
+  </div>
+  
+  <div class="flex flex-col md:flex-row">
+    <!-- Sidebar Info (Integrated into Terminal) -->
+    <div class="md:w-1/3 bg-primary/40 p-8 border-r border-outline-variant/20 flex flex-col justify-between">
+      <div>
+        <div class="text-[10px] uppercase tracking-widest text-primary-fixed-dim mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Agent Active
+        </div>
+        <div class="font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">02 / ASK</div><h3 class="font-headline-md text-headline-lg-mobile text-primary-fixed-dim font-bold">Ask Me Anything</h3>
+        <p class="text-primary-fixed-dim/70 text-[13px] leading-relaxed mt-4">A RAG-powered agent that retrieves from my work, projects, and other aspects of life. Ask away!</p>
+      </div>
+      <div class="hidden md:block mt-12 pt-4 border-t border-outline-variant/20">
+        <p class="text-[10px] text-primary-fixed-dim/50">VERSION: 0.0.1<br>MODEL: GPT-4.1 (that's what i could afford)</p>
+      </div>
+    </div>
+
+    <!-- Terminal Interface Area -->
+    <div class="md:w-2/3 p-6 md:p-8 flex flex-col h-[500px] bg-primary-container">
+      <div class="flex-grow overflow-y-auto terminal-scroll pr-4 space-y-6 mb-6">
+        <!-- Initial Message -->
+        <div class="flex gap-4">
+          <div class="w-8 h-8 rounded-none border border-primary-fixed-dim/30 flex-shrink-0 flex items-center justify-center text-primary-fixed-dim font-label-mono text-[12px]">CB</div>
+          <div class="bg-primary/30 p-4 border border-outline-variant/10 text-[13px] text-primary-fixed-dim w-full">
+            <p class="opacity-90">System initialized. I am an agent for Chaitanya.</p>
+            <p class="mt-2 opacity-90">I can answer questions about architecture, specific projects, or preferred tech stacks. What would you like to know?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="mt-auto">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button class="text-[10px] border border-primary-fixed-dim/20 px-3 py-1.5 hover:bg-primary/50 transition-colors text-primary-fixed-dim uppercase">Tell me about your work</button>
+          <button class="text-[10px] border border-primary-fixed-dim/20 px-3 py-1.5 hover:bg-primary/50 transition-colors text-primary-fixed-dim uppercase">What is your favourite food and why is it biryani?</button>
+        </div>
+        <div class="relative flex items-center border border-primary-fixed-dim/30 bg-primary/30 p-2 gap-3">
+  <!-- Window Controls -->
+  
+  
+  <!-- Prompt and Input -->
+  <div class="flex-grow flex items-center font-label-mono text-[13px]">
+    <span class="text-green-500 font-bold whitespace-nowrap">chaitbot:~$ </span>
+    <div class="relative flex-grow">
+      <input type="text" placeholder="" class="w-full bg-transparent border-none focus:ring-0 font-label-mono text-[13px] text-primary-fixed-dim p-0 pl-2 placeholder-primary-fixed-dim/30">
+      <!-- Blinking Cursor Simulation -->
+      <div class="absolute left-[calc(0%+8px)] top-1/2 -translate-y-1/2 w-2 h-4 bg-primary-fixed-dim/50 animate-pulse pointer-events-none"></div>
+    </div>
+  </div>
+
+  <!-- Minimal Execute Button -->
+  <button class="flex items-center justify-center w-8 h-8 border border-primary-fixed-dim/30 text-primary-fixed-dim hover:bg-primary-fixed-dim hover:text-primary transition-colors">
+    <span class="material-symbols-outlined text-[18px]">keyboard_return</span>
+  </button>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="pt-section-gap pb-section-gap relative" id="works">
+<div class="mb-12 flex flex-col items-start hairline-b pb-4">
+<div class="reveal font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">03 / projects</div>
+<h2 class="reveal font-headline-md text-headline-lg-mobile text-primary">What I've Built</h2>
+</div>
+<div class="editorial-grid">
+<!-- Project 1 (Large left) -->
+<div class="reveal col-span-4 md:col-span-7 flex flex-col gap-4">
+<div class="relative hairline aspect-[4/3] bg-surface-container-high overflow-hidden group">
+<div class="absolute top-4 left-4 bg-background px-2 py-1 font-label-mono text-[10px] hairline z-10 uppercase">Vol. 1</div>
+<div class="w-full h-full bg-surface-variant flex items-center justify-center text-outline font-label-mono transition-transform duration-500 group-hover:scale-105">[IMG_PLACEHOLDER]</div>
+</div>
+<div>
+<h3 class="font-headline-md text-[24px] text-primary mb-2">Automated Editorial Workflow</h3>
+<p class="font-body-md text-on-surface-variant mb-3">A multi-agent system designed to review, critique, and refactor generated UI components before they reach the repository.</p>
+<div class="flex gap-2">
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">TypeScript</span>
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">Python</span>
+</div>
+</div>
+</div>
+<!-- Project 2 (Stacked right) -->
+<div class="reveal col-span-4 md:col-span-5 flex flex-col gap-12 mt-12 md:mt-24">
+<div class="flex flex-col gap-4">
+<div class="relative hairline aspect-square bg-surface-container-high overflow-hidden group">
+<div class="absolute top-4 left-4 bg-background px-2 py-1 font-label-mono text-[10px] hairline z-10 uppercase">Vol. 2</div>
+<div class="w-full h-full bg-surface-variant flex items-center justify-center text-outline font-label-mono transition-transform duration-500 group-hover:scale-105">[IMG_PLACEHOLDER]</div>
+</div>
+<div>
+<h3 class="font-headline-md text-[24px] text-primary mb-2">Design System Compiler</h3>
+<p class="font-body-md text-on-surface-variant mb-3">Translating Figma tokens directly into validated Tailwind configurations via AST manipulation.</p>
+<div class="flex gap-2">
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">AST</span>
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">Node.js</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Project 3 (Centered wide) -->
+<div class="reveal col-span-4 md:col-span-10 md:col-start-2 mt-12">
+<div class="flex flex-col md:flex-row gap-8 hairline p-4 bg-surface-bright shadow-[4px_4px_0_0_#1b3022]">
+<div class="relative aspect-video md:w-3/5 bg-surface-container-high overflow-hidden group hairline">
+<div class="absolute top-4 left-4 bg-background px-2 py-1 font-label-mono text-[10px] hairline z-10 uppercase">Vol. 3</div>
+<div class="w-full h-full bg-surface-variant flex items-center justify-center text-outline font-label-mono transition-transform duration-500 group-hover:scale-105">[IMG_PLACEHOLDER]</div>
+</div>
+<div class="md:w-2/5 flex flex-col justify-center pr-4">
+<h3 class="font-headline-md text-[24px] text-primary mb-2">The Archive Engine</h3>
+<p class="font-body-md text-on-surface-variant mb-4">A high-performance retrieval system for architectural design patterns, leveraging vector embeddings and edge caching.</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">Vector DB</span>
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">Next.js</span>
+<span class="font-label-mono text-[10px] uppercase border border-outline-variant px-2 py-0.5 text-outline">Redis</span>
+</div>
+<a href="#" class="font-label-mono text-label-mono text-primary hairline-b inline-flex items-center gap-1 w-max hover:text-accent-coral transition-colors">
+                            Read Case Study <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section><section class="pt-section-gap pb-section-gap relative" id="experience"><div class="mb-12 flex flex-col items-start hairline-b pb-4">
+<div class="reveal font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">04 / chronological_logs</div>
+<h2 class="reveal font-headline-md text-headline-lg-mobile text-primary">Experience</h2>
+</div>
+  <div class="relative">
+    <!-- Vertical Timeline Axis -->
+    <div class="absolute left-0 md:left-[140px] top-0 bottom-0 w-px bg-outline-variant/30"></div>
+    
+    <div class="space-y-16">
+      <!-- Entry 1: Senior Systems Architect -->
+      <div class="reveal-left relative flex flex-col md:flex-row gap-8 group">
+        <!-- Margin Area (Date) -->
+        <div class="md:w-[140px] flex-shrink-0 pt-1">
+          <span class="font-label-mono text-[12px] text-accent-coral font-bold uppercase tracking-widest block md:text-right md:pr-8">2022 — NOW</span>
+          <span class="font-label-mono text-[8px] text-outline/60 uppercase tracking-widest block md:text-right md:pr-8 mt-1">LOG_ID: 001</span>
+        </div>
+        
+        <!-- Timeline Node -->
+        <div class="absolute left-[-4px] md:left-[136px] top-2 w-2 h-2 rounded-full bg-accent-coral ring-4 ring-background z-10"></div>
+        
+        <!-- Content Area -->
+        <div class="flex-grow md:pl-8">
+          <div class="flex items-center gap-3 mb-2">
+            <h3 class="font-display-lg italic text-[24px] text-primary">Senior Systems Architect</h3>
+            <span class="flex items-center gap-1 px-2 py-0.5 bg-accent-coral/10 text-accent-coral font-label-mono text-[8px] uppercase tracking-widest hairline">● Active</span>
+          </div>
+          <p class="font-label-mono text-[14px] text-primary font-bold mb-4 uppercase tracking-wider">Studio Archive</p>
+          <div class="max-w-2xl p-6 bg-surface-bright hairline shadow-[4px_4px_0_0_#1b3022] group-hover:bg-surface-container-low transition-colors">
+            <p class="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
+              Leading the development of multi-agent RAG systems and high-performance retrieval engines. Orchestrating infrastructure for scale while maintaining editorial precision in code generation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entry 2: Full-Stack Engineer -->
+      <div class="reveal-left relative flex flex-col md:flex-row gap-8 group">
+        <!-- Margin Area (Date) -->
+        <div class="md:w-[140px] flex-shrink-0 pt-1">
+          <span class="font-label-mono text-[12px] text-outline font-bold uppercase tracking-widest block md:text-right md:pr-8">2020 — 2022</span>
+          <span class="font-label-mono text-[8px] text-outline/60 uppercase tracking-widest block md:text-right md:pr-8 mt-1">LOG_ID: 002</span>
+        </div>
+        
+        <!-- Timeline Node -->
+        <div class="absolute left-[-4px] md:left-[136px] top-2 w-2 h-2 rounded-full bg-outline-variant ring-4 ring-background z-10"></div>
+        
+        <!-- Content Area -->
+        <div class="flex-grow md:pl-8">
+          <h3 class="font-display-lg italic text-[24px] text-primary mb-2">Full-Stack Engineer</h3>
+          <p class="font-label-mono text-[14px] text-primary font-bold mb-4 uppercase tracking-wider">Localhost Labs</p>
+          <div class="max-w-2xl p-6 bg-surface-bright hairline group-hover:bg-surface-container-low transition-colors">
+            <p class="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
+              Developed and maintained complex web applications using Next.js and Python. Focused on bridging the gap between design tokens and production-ready CSS architectures.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entry 3: Frontend Developer -->
+      <div class="reveal-left relative flex flex-col md:flex-row gap-8 group">
+        <!-- Margin Area (Date) -->
+        <div class="md:w-[140px] flex-shrink-0 pt-1">
+          <span class="font-label-mono text-[12px] text-outline font-bold uppercase tracking-widest block md:text-right md:pr-8">2018 — 2020</span>
+          <span class="font-label-mono text-[8px] text-outline/60 uppercase tracking-widest block md:text-right md:pr-8 mt-1">LOG_ID: 003</span>
+        </div>
+        
+        <!-- Timeline Node -->
+        <div class="absolute left-[-4px] md:left-[136px] top-2 w-2 h-2 rounded-full bg-outline-variant ring-4 ring-background z-10"></div>
+        
+        <!-- Content Area -->
+        <div class="flex-grow md:pl-8">
+          <h3 class="font-display-lg italic text-[24px] text-primary mb-2">Frontend Developer</h3>
+          <p class="font-label-mono text-[14px] text-primary font-bold mb-4 uppercase tracking-wider">Creative Syntax</p>
+          <div class="max-w-2xl p-6 bg-surface-bright hairline group-hover:bg-surface-container-low transition-colors">
+            <p class="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
+              Specialized in building accessible, high-fidelity UI components and design systems. Implemented automated testing workflows for editorial-heavy digital products.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+<!-- Stack & Tools Section -->
+<section class="pt-section-gap pb-section-gap relative" id="toolkit">
+<div class="mb-12 flex flex-col items-start hairline-b pb-4">
+<div class="reveal font-label-mono text-[10px] text-outline/60 uppercase tracking-widest mb-2">05 / tech_stack</div>
+<h2 class="reveal font-headline-md text-headline-lg-mobile text-primary">Toolkit</h2>
+</div>
+<div class="editorial-grid">
+<div class="col-span-4 md:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Tool Card 1 -->
+<div class="reveal-stamp bg-surface-bright hairline p-4 relative group hover:bg-surface-container-low transition-colors">
+<div class="absolute top-0 right-0 w-4 h-4 bg-accent-mustard hairline-l hairline-b flex items-center justify-center">
+<span class="font-label-mono text-[8px]">+</span>
+</div>
+<h4 class="font-label-mono text-[14px] text-primary mb-4 uppercase tracking-wider font-bold">Languages</h4>
+<ul class="font-label-mono text-[12px] text-on-surface-variant space-y-2">
+<li class="">TypeScript</li>
+<li class="">Python</li>
+<li class="">SQL (Postgres)</li>
+<li class="">HTML/CSS</li>
+</ul>
+</div>
+<!-- Tool Card 2 -->
+<div class="reveal-stamp bg-surface-bright hairline p-4 relative group hover:bg-surface-container-low transition-colors">
+<div class="absolute top-0 right-0 w-4 h-4 bg-accent-coral hairline-l hairline-b flex items-center justify-center">
+<span class="font-label-mono text-[8px]">+</span>
+</div>
+<h4 class="font-label-mono text-[14px] text-primary mb-4 uppercase tracking-wider font-bold">Frameworks</h4>
+<ul class="font-label-mono text-[12px] text-on-surface-variant space-y-2">
+<li class="">Next.js</li>
+<li class="">Tailwind CSS</li>
+<li class="">FastAPI</li>
+<li class="">LangChain</li>
+</ul>
+</div>
+<!-- Tool Card 3 -->
+<div class="reveal-stamp bg-surface-bright hairline p-4 relative group hover:bg-surface-container-low transition-colors">
+<div class="absolute top-0 right-0 w-4 h-4 bg-surface-variant hairline-l hairline-b flex items-center justify-center">
+<span class="font-label-mono text-[8px]">+</span>
+</div>
+<h4 class="font-label-mono text-[14px] text-primary mb-4 uppercase tracking-wider font-bold">Infrastructure</h4>
+<ul class="font-label-mono text-[12px] text-on-surface-variant space-y-2">
+<li class="">Docker</li>
+<li class="">Vercel</li>
+<li class="">AWS (S3, EC2)</li>
+<li class="">Supabase</li>
+</ul>
+</div>
+<!-- Tool Card 4 -->
+<div class="reveal-stamp bg-surface-bright hairline p-4 relative group hover:bg-surface-container-low transition-colors">
+<div class="absolute top-0 right-0 w-4 h-4 bg-surface-variant hairline-l hairline-b flex items-center justify-center">
+<span class="font-label-mono text-[8px]">+</span>
+</div>
+<h4 class="font-label-mono text-[14px] text-primary mb-4 uppercase tracking-wider font-bold">Design / Other</h4>
+<ul class="font-label-mono text-[12px] text-on-surface-variant space-y-2">
+<li class="">Figma</li>
+<li class="">Git / GitHub Actions</li>
+<li class="">Vim (Neovim)</li>
+<li class="">Markdown</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<!-- AI Chatbot Section -->
+
+
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="dark:bg-background full-width border-t border-primary dark:border-primary-fixed-dim flat no shadows relative z-10 bg-surface-container" id="contact"><div class="w-full px-margin-edge max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-start gap-gutter pt-12 pb-8"><div class="reveal flex flex-col md:w-1/2"><div class="mb-12"><h2 class="font-headline-md text-[24px] text-primary dark:text-primary-fixed-dim mb-4">Say hello</h2><p class="font-body-lg text-on-surface-variant max-w-sm">If the AI above didn't answer it, I probably can.</p></div></div><div class="flex flex-col items-start md:items-end gap-4 md:w-1/2"><span class="font-label-mono text-[8px] text-outline/60 uppercase tracking-widest mb-4">Connect</span><div class="flex flex-col items-start md:items-end gap-2"><a class="font-label-mono text-[10px] text-outline dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors uppercase tracking-widest" href="#">GitHub</a><a class="font-label-mono text-[10px] text-outline dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors uppercase tracking-widest" href="#">LinkedIn</a><a class="font-label-mono text-[10px] text-outline dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors uppercase tracking-widest" href="#">Email</a></div></div></div><div class="w-full px-margin-edge max-w-container-max mx-auto border-t border-outline-variant/20 py-8 flex flex-col items-center text-center gap-1"><p class="font-label-mono text-[10px] text-outline dark:text-outline-variant uppercase tracking-widest">© 2026 Chaitanya Bandiwdekar</p><p class="font-label-mono text-[10px] text-outline/60 dark:text-outline-variant/60 italic">Built, broken, and rebuilt more times than this footer admits.</p></div></footer>
+
+
+
+</body></html>

@@ -1,26 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
+import { setStreaming, flagError } from '../../lib/chat/activity'
 import { streamChat } from '../../lib/chat/client'
 import { runCommand } from '../../lib/chat/commands'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { TerminalWindow } from './TerminalWindow'
 
 type Entry =
   | { id: number; kind: 'input'; text: string }
   | { id: number; kind: 'output'; text: string }
   | { id: number; kind: 'bot'; text: string; streaming: boolean }
 
+const GREETING_ID = 0
+
 const GREETING: Entry[] = [
-  { id: 0, kind: 'output', text: 'chaitbot v0.0.1 — an agent for chaitanya. type `help` for commands,' },
   {
-    id: 1,
-    kind: 'output',
-    text: 'or just ask about projects, architecture, or tech stacks. i have read all the documents. all of them.',
+    id: GREETING_ID,
+    kind: 'bot',
+    text: "hi — i'm an agent for chaitanya. ask about projects, architecture, or tech stacks. i have read all the documents. all of them.",
+    streaming: false,
   },
 ]
 
 const SUGGESTIONS = ['tell me about your work', 'what is your favourite food and why is it biryani?']
 
-let nextId = 2
+let nextId = 1
 
 export function Terminal() {
   const [entries, setEntries] = useState<Entry[]>(GREETING)
@@ -35,7 +37,9 @@ export function Terminal() {
 
   useEffect(() => {
     const el = scrollRef.current
-    if (el) el.scrollTop = el.scrollHeight
+    if (!el) return
+    el.scrollTop = el.scrollHeight
+    el.toggleAttribute('data-lenis-prevent', el.scrollHeight > el.clientHeight)
   }, [entries])
 
   const append = (entry: Omit<Entry, 'id'>) =>
@@ -70,6 +74,7 @@ export function Terminal() {
         ),
       )
 
+    setStreaming(true)
     try {
       let full = ''
       for await (const event of streamChat(text, sessionIdRef.current)) {
@@ -80,10 +85,12 @@ export function Terminal() {
           sessionIdRef.current = event.sessionId
         } else {
           full = full ? `${full}\n[error] ${event.message}` : `[error] ${event.message}`
+          flagError()
         }
       }
       patchBot(() => full, false) // reduced motion: whole message lands at once
     } finally {
+      setStreaming(false)
       setBusy(false)
     }
   }
@@ -91,91 +98,112 @@ export function Terminal() {
   const hasSubmitted = entries.some((entry) => entry.kind === 'input')
 
   return (
-    <TerminalWindow title="chaitbot: ~/chat">
-      {/* click anywhere in the terminal focuses the input, like a real terminal;
-          keyboard users reach the input directly via Tab, so no key handler needed here */}
-      <div onClick={() => inputRef.current?.focus()}>
-        <div
-          ref={scrollRef}
-          role="log"
-          aria-live="polite"
-          aria-label="Chat transcript"
-          data-lenis-prevent
-          className="h-[22rem] overflow-y-auto px-4 py-3 font-mono text-mono max-lg:h-[18rem]"
-        >
-          {entries.map((entry) => (
-            <p key={entry.id} className="mb-1 whitespace-pre-wrap break-words">
-              {entry.kind === 'input' && (
-                <>
-                  <span aria-hidden="true" className="text-term-green">❯ </span>
-                  <span className="text-ink">{entry.text}</span>
-                </>
-              )}
-              {entry.kind === 'output' && <span className="text-muted">{entry.text}</span>}
-              {entry.kind === 'bot' && (
-                <span className={entry.streaming ? 'cursor-blink text-ink' : 'text-ink'}>
-                  {entry.text || (entry.streaming ? 'thinking…' : '')}
+    // click anywhere in the pane focuses the input, like a real chat window;
+    // keyboard users reach the input directly via Tab, so no key handler needed here
+    <div className="flex min-w-0 flex-col lg:contain-size" onClick={() => inputRef.current?.focus()}>
+      <div
+        ref={scrollRef}
+        role="log"
+        aria-live="polite"
+        aria-label="Chat transcript"
+        className="space-y-3 overflow-y-auto overscroll-contain px-4 py-3 max-lg:h-[16rem] lg:min-h-0 lg:flex-1"
+      >
+        {entries.map((entry) => (
+          <div key={entry.id}>
+            {entry.kind === 'bot' && (
+              <div className="flex gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 shrink-0 items-center justify-center rounded border border-line font-mono text-mono-sm text-muted"
+                >
+                  cb
                 </span>
-              )}
-            </p>
-          ))}
-        </div>
+                <div className="max-w-[60ch] rounded border border-line bg-surface-2/60 px-3 py-2">
+                  <p
+                    className={`whitespace-pre-wrap break-words text-ink ${entry.streaming ? 'cursor-blink' : ''}`}
+                  >
+                    {entry.text || (entry.streaming ? 'thinking…' : '')}
+                  </p>
+                  {entry.id === GREETING_ID && (
+                    <p className="mt-1 font-mono text-mono-sm text-muted">type `help` for commands.</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {entry.kind === 'input' && (
+              <p className="whitespace-pre-wrap break-words text-right font-mono text-mono">
+                <span className="text-muted">you ❯ </span>
+                <span className="text-ink">{entry.text}</span>
+              </p>
+            )}
+            {entry.kind === 'output' && (
+              <p className="whitespace-pre-wrap break-words font-mono text-mono text-muted">
+                {entry.text}
+              </p>
+            )}
+          </div>
+        ))}
         {!hasSubmitted && (
-          <div className="flex flex-wrap gap-2 border-t border-line px-4 py-3">
+          <div className="flex flex-wrap gap-2">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
                 disabled={busy}
                 onClick={() => void submit(suggestion)}
-                className="rounded border border-line px-2 py-1 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50"
+                className="rounded border border-line px-3 py-1.5 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50"
               >
                 {suggestion}
               </button>
             ))}
           </div>
         )}
-        <form
-          className="flex items-center gap-2 border-t border-line px-4 py-3"
-          onSubmit={(e) => {
-            e.preventDefault()
-            void submit()
-          }}
-        >
-          <label htmlFor="terminal-input" className="sr-only">
-            Type a command or question
-          </label>
-          <span aria-hidden="true" className="font-mono text-mono text-term-green">❯</span>
-          <input
-            id="terminal-input"
-            ref={inputRef}
-            value={input}
-            disabled={busy}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowUp' && history.length > 0) {
-                e.preventDefault()
-                const idx = Math.min(historyIdx + 1, history.length - 1)
-                setHistoryIdx(idx)
-                setInput(history[idx])
-              } else if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                const idx = historyIdx - 1
-                setHistoryIdx(idx)
-                setInput(idx < 0 ? '' : history[idx])
-              }
-            }}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder={busy ? 'thinking…' : 'ask me anything (or try `help`)'}
-            className="w-full bg-transparent font-mono text-mono text-ink outline-none placeholder:text-muted"
-            style={{ caretColor: 'var(--color-term-green)' }}
-          />
-        </form>
-        <p className="border-t border-line px-4 py-2 font-mono text-mono-sm text-muted">
-          v0.0.1 · model: gpt-4.1 (that's what i could afford)
-        </p>
       </div>
-    </TerminalWindow>
+      <form
+        className="flex items-center gap-2 border-t border-line px-4 py-3"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void submit()
+        }}
+      >
+        <label htmlFor="terminal-input" className="sr-only">
+          Type a command or question
+        </label>
+        <span aria-hidden="true" className="font-mono text-mono text-term-green">❯</span>
+        <input
+          id="terminal-input"
+          ref={inputRef}
+          value={input}
+          disabled={busy}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp' && history.length > 0) {
+              e.preventDefault()
+              const idx = Math.min(historyIdx + 1, history.length - 1)
+              setHistoryIdx(idx)
+              setInput(history[idx])
+            } else if (e.key === 'ArrowDown') {
+              e.preventDefault()
+              const idx = historyIdx - 1
+              setHistoryIdx(idx)
+              setInput(idx < 0 ? '' : history[idx])
+            }
+          }}
+          autoComplete="off"
+          spellCheck={false}
+          placeholder={busy ? 'thinking…' : 'ask me anything (or try `help`)'}
+          className="w-full bg-transparent font-mono text-mono text-ink outline-none placeholder:text-muted"
+          style={{ caretColor: 'var(--color-term-green)' }}
+        />
+        <button
+          type="submit"
+          aria-label="Send"
+          disabled={busy}
+          className="flex size-8 shrink-0 items-center justify-center rounded border border-line font-mono text-mono text-muted hover:bg-surface-2 disabled:opacity-50"
+        >
+          ⏎
+        </button>
+      </form>
+    </div>
   )
 }

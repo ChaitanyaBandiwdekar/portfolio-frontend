@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { Robot, pointerTarget, entrance } from './Robot'
+import { Robot, pointerTarget, entrance, hoverTarget } from './Robot'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
 
@@ -23,13 +23,26 @@ export function RobotScene() {
   }, [])
 
   useEffect(() => {
+    const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
     const onMove = (e: PointerEvent) => {
-      pointerTarget.x = (e.clientX / window.innerWidth) * 2 - 1
-      pointerTarget.y = (e.clientY / window.innerHeight) * 2 - 1
+      const el = wrapRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      pointerTarget.x = clamp((e.clientX - (r.left + r.width / 2)) / (r.width / 2), -1.6, 1.6)
+      pointerTarget.y = clamp((e.clientY - (r.top + r.height * 0.42)) / (r.height / 2), -1.6, 1.6)
       pointerTarget.active = true
+      // tighter box than the full canvas — approximates the robot's own silhouette
+      // (the canvas has generous empty padding above/beside the model)
+      const hoverLeft = r.left + r.width * 0.22
+      const hoverRight = r.right - r.width * 0.15
+      const hoverTop = r.top + r.height * 0.24
+      const hoverBottom = r.bottom - r.height * 0.02
+      hoverTarget.active =
+        e.clientX >= hoverLeft && e.clientX <= hoverRight && e.clientY >= hoverTop && e.clientY <= hoverBottom
     }
     const onLeave = () => {
       pointerTarget.active = false
+      hoverTarget.active = false
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerout', onLeave)
@@ -64,19 +77,11 @@ export function RobotScene() {
     <div
       ref={wrapRef}
       aria-hidden="true"
-      className="relative h-[30rem] max-lg:h-[18rem]"
+      className="relative h-[26rem] max-lg:h-[11rem]"
     >
-      {/* the permitted spotlight glow, behind the robot */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 60% 50% at 50% 45%, oklch(0.32 0.1 355 / 0.3), transparent 70%)',
-        }}
-      />
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, -0.1, 3.6], fov: 42 }}
+        camera={{ position: [0, -0.1, 3.2], fov: 42 }}
         frameloop={inView ? 'always' : 'never'}
         gl={{ antialias: true, alpha: true }}
       >

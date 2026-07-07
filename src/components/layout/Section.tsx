@@ -1,12 +1,12 @@
 import { useRef, type ReactNode } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SplitText } from 'gsap/SplitText'
+import { TextPlugin } from 'gsap/TextPlugin'
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin'
 import { useGSAP } from '@gsap/react'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 
-gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin) // idempotent
+gsap.registerPlugin(ScrollTrigger, TextPlugin, ScrambleTextPlugin) // idempotent
 
 type SectionProps = {
   id: string
@@ -17,44 +17,44 @@ type SectionProps = {
 
 export function Section({ id, title, command, children }: SectionProps) {
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const commandRef = useRef<HTMLSpanElement>(null)
+  const textRef = useRef<HTMLSpanElement>(null)
   const reducedMotion = usePrefersReducedMotion()
 
   useGSAP(
     () => {
       if (reducedMotion || !headingRef.current) return
-      // SplitText's default aria handling puts an aria-label on the heading
-      // and aria-hidden on the char spans — screen readers read the intact text.
-      const split = SplitText.create(headingRef.current, { type: 'chars' })
-      gsap.from(split.chars, {
-        yPercent: 60,
-        opacity: 0,
-        ease: 'power4.out',
-        stagger: 0.02,
+      // No command means no animation — title stays static.
+      if (!command) return
+      // Terminal-style reveal: type the command into the heading, then
+      // scramble-resolve into the real title. The h2's aria-label carries
+      // the real title for screen readers; the animated span is aria-hidden.
+      // Blank the heading up front so the title never flashes before the
+      // trigger fires — only the blinking cursor shows until then.
+      gsap.set(textRef.current, { text: '' })
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: headingRef.current,
-          start: 'top 88%',
-          end: 'top 55%',
-          scrub: 0.5,
+          start: 'top 35%',
         },
       })
-      // command subline scrambles into place once, in sync with the heading reveal
-      if (command && commandRef.current) {
-        gsap.to(commandRef.current, {
-          scrambleText: {
-            text: command,
-            chars: '!<>-_\\/[]{}=+*^?#$%',
-            speed: 0.4,
+      tl.to(textRef.current, {
+        text: command,
+        duration: command.length * 0.05,
+        ease: 'none',
+      })
+        .to(
+          textRef.current,
+          {
+            scrambleText: {
+              text: title,
+              chars: '!<>-_\\/[]{}=+*^?#$%',
+              speed: 0.4,
+            },
+            duration: 1,
+            ease: 'power4.out',
           },
-          duration: 1,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 75%',
-          },
-        })
-      }
-      return () => split.revert()
+          '+=1.2',
+        )
     },
     { dependencies: [reducedMotion] },
   )
@@ -62,22 +62,18 @@ export function Section({ id, title, command, children }: SectionProps) {
   return (
     <section
       id={id}
-      className="mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] py-[calc(var(--space-section)/2)] scroll-mt-24"
+      className="mx-auto flex min-h-svh w-full max-w-[var(--container)] flex-col justify-center px-[var(--gutter)] py-[calc(var(--space-section)/2)]"
     >
       <h2
         ref={headingRef}
-        className={`font-display text-h2 font-semibold text-ink${command ? '' : ' mb-12'}`}
+        aria-label={title}
+        className="font-display text-h2 font-semibold text-ink mb-12"
       >
-        {title}
+        <span ref={textRef} aria-hidden="true" className="inline-block">
+          {title}
+        </span>
+        <span className="cursor-blink-line" />
       </h2>
-      {command && (
-        <p className="mb-12 mt-2 font-mono text-mono-sm text-muted">
-          <span ref={commandRef} className="inline-block">
-            {command}
-          </span>
-          <span className="cursor-blink" />
-        </p>
-      )}
       {children}
     </section>
   )

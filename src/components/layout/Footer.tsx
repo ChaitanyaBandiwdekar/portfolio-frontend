@@ -31,10 +31,7 @@ export function Footer() {
           </li>
         </ul>
         <p className="mt-14 font-mono text-mono-sm text-muted">
-          © {year} {site.name} · handcrafted, no template
-        </p>
-        <p className="mt-1 font-mono text-mono-sm text-muted">
-          process exited with code 0 <span aria-hidden="true">(success)</span>
+          © {year} {site.name} · process exited with code 0
         </p>
       </div>
     </footer>

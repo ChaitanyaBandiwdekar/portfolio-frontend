@@ -117,12 +117,25 @@
     animation: blink 1.1s steps(1) infinite;
   }
 
+  /* Underscore variant — sits at the text baseline like a prompt cursor */
+  .cursor-blink-line::after {
+    content: '';
+    display: inline-block;
+    width: 0.6em;
+    height: 0.09em;
+    margin-left: 0.15em;
+    vertical-align: baseline;
+    background-color: var(--color-term-green);
+    animation: blink 1.1s steps(1) infinite;
+  }
+
   @keyframes blink {
     50% { opacity: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .cursor-blink::after { animation: none; }
+    .cursor-blink-line::after { animation: none; }
   }
 
   @keyframes bob {
