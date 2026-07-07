@@ -3,15 +3,31 @@ import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 
 const LINES = [
   '$ ./portfolio --init',
-  'loading personality ......... ok',
-  'mounting humour module ...... ok (deadpan v2.1)',
+  'mounting humour module ...... ok (sarcastic v2.1)',
+  'importing side projects ..... 60 in ideation, 37 abandoned, 3 complete',
   'establishing eye contact .... skipped (introvert mode)',
-  'ready.',
+  'checking for bugs ........... rebranded as features (true story)',
+  'ready........................ mostly.',
 ]
 
 const CHAR_DELAY = 14 // ms per character
 const LINE_PAUSE = 90 // ms between lines
 const EXIT_DELAY = 350 // ms after last line before fade
+
+const DOT_RUN = /\.{3,}/
+const DOT_PAUSE_MIN = 500 // ms, pause before/after the dotted part
+const DOT_PAUSE_MAX = 750
+const LAST_LINE_DOT_PAUSE_MIN = 1250 // ms, longer beat on the final line for comic timing
+const LAST_LINE_DOT_PAUSE_MAX = 1500
+
+function randomBetween(min: number, max: number): number {
+  return min + Math.random() * (max - min)
+}
+
+function dotRunRange(line: string): [number, number] | null {
+  const match = DOT_RUN.exec(line)
+  return match ? [match.index, match.index + match[0].length] : null
+}
 
 function shouldSkip(reducedMotion: boolean): boolean {
   return reducedMotion || sessionStorage.getItem('booted') === '1'
@@ -58,7 +74,15 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
         return next
       })
       if (charIdx < line.length) {
-        timeouts.push(window.setTimeout(() => typeLine(lineIdx, charIdx + 1), CHAR_DELAY))
+        let delay = CHAR_DELAY
+        const dotRange = dotRunRange(line)
+        if (dotRange && (charIdx === dotRange[0] || charIdx === dotRange[1])) {
+          const isLastLine = lineIdx === LINES.length - 1
+          delay += isLastLine
+            ? randomBetween(LAST_LINE_DOT_PAUSE_MIN, LAST_LINE_DOT_PAUSE_MAX)
+            : randomBetween(DOT_PAUSE_MIN, DOT_PAUSE_MAX)
+        }
+        timeouts.push(window.setTimeout(() => typeLine(lineIdx, charIdx + 1), delay))
       } else {
         timeouts.push(window.setTimeout(() => typeLine(lineIdx + 1, 0), LINE_PAUSE))
       }
@@ -83,7 +107,7 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
       className="fixed inset-0 flex items-center justify-center bg-bg transition-opacity duration-400"
       style={{ zIndex: 'var(--z-modal)', opacity: leaving ? 0 : 1 }}
     >
-      <div className="w-full max-w-xl px-[var(--gutter)] font-mono text-mono text-term-green">
+      <div className="w-full max-w-3xl px-[var(--gutter)] font-mono text-mono text-term-green max-sm:text-mono-sm">
         {rendered.map((line, i) => (
           <p key={i} className={i === rendered.length - 1 ? 'cursor-blink' : undefined}>
             {line}
