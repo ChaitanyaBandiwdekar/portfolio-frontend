@@ -16,14 +16,25 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const lenis = new Lenis({ lerp: 0.1, anchors: true })
     lenis.on('scroll', ScrollTrigger.update)
 
-    // Gentle section snapping — desktop only, proximity-based so free
-    // scrolling still works between folds.
+    // Exponential ease-out for a smooth, decisive snap settle.
+    const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
+
+    // Section snapping — desktop only. Proximity at a 50% threshold so any
+    // rest position between two folds resolves to the nearer section (no dead
+    // gaps), while sections taller than the viewport keep a free-scroll band in
+    // their middle (both edges sit beyond the threshold).
     const mq = window.matchMedia('(min-width: 768px)')
     let snap: Snap | null = null
     const updateSnap = () => {
       if (mq.matches) {
         if (snap) return
-        snap = new Snap(lenis, { type: 'proximity', distanceThreshold: '30%' })
+        snap = new Snap(lenis, {
+          type: 'proximity',
+          distanceThreshold: '50%',
+          duration: 0.9,
+          easing: easeOutExpo,
+          debounce: 250,
+        })
         document
           .querySelectorAll<HTMLElement>('main section[id]')
           .forEach((el) => snap?.addElement(el, { align: 'start' }))

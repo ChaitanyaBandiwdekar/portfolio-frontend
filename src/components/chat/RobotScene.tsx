@@ -3,7 +3,9 @@ import { Canvas } from '@react-three/fiber'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { Robot, pointerTarget, entrance, hoverTarget } from './Robot'
+import { setHover } from '../../lib/chat/activity'
+import { Robot, pointerTarget, entrance } from './Robot'
+import { MoodBadge } from './MoodBadge'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
 
@@ -37,12 +39,13 @@ export function RobotScene() {
       const hoverRight = r.right - r.width * 0.15
       const hoverTop = r.top + r.height * 0.24
       const hoverBottom = r.bottom - r.height * 0.02
-      hoverTarget.active =
-        e.clientX >= hoverLeft && e.clientX <= hoverRight && e.clientY >= hoverTop && e.clientY <= hoverBottom
+      setHover(
+        e.clientX >= hoverLeft && e.clientX <= hoverRight && e.clientY >= hoverTop && e.clientY <= hoverBottom,
+      )
     }
     const onLeave = () => {
       pointerTarget.active = false
-      hoverTarget.active = false
+      setHover(false)
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerout', onLeave)
@@ -91,6 +94,7 @@ export function RobotScene() {
         <pointLight position={[-3, 1, -2]} intensity={14} color="#c2185b" />
         <Robot reducedMotion={reducedMotion} />
       </Canvas>
+      <MoodBadge />
     </div>
   )
 }

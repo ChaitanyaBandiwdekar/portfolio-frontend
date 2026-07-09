@@ -163,4 +163,24 @@
   @media (prefers-reduced-motion: reduce) {
     .expandable { transition: none; }
   }
+
+  /* Mood badge: sequential loading dots + a brief fade on glyph swap */
+  @keyframes mood-dot-pulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+  .mood-dot-0 { animation: mood-dot-pulse 1.2s ease-in-out infinite; }
+  .mood-dot-1 { animation: mood-dot-pulse 1.2s ease-in-out infinite 0.15s; }
+  .mood-dot-2 { animation: mood-dot-pulse 1.2s ease-in-out infinite 0.3s; }
+
+  @keyframes mood-glyph-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .mood-glyph-enter { animation: mood-glyph-enter 0.25s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mood-dot-0, .mood-dot-1, .mood-dot-2 { animation: none; opacity: 1; }
+    .mood-glyph-enter { animation: none; }
+  }
 }

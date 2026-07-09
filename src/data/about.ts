@@ -6,10 +6,11 @@ export const about = {
   ],
   // right-hand mono "process facts" — deadpan system readout
   facts: [
-    { key: 'uptime', value: 'X years in software' }, // TODO(owner)
-    { key: 'current_obsession', value: 'something specific' }, // TODO(owner)
-    { key: 'editor', value: 'your editor of choice' }, // TODO(owner)
-    { key: 'tabs_vs_spaces', value: 'resolved at the formatter level' },
+    { key: 'uptime', value: '3 years in software development' },
+    { key: 'current_obsession', value: 'Micromanaging tokens on Claude Pro' },
+    { key: 'ai_strategy', value: 'Strict permissions for 5 mins, then Allow All for this session' },
+    { key: 'technical_debt', value: "Tomorrow's problem (jk, assign me that jira)" },
+    { key: 'qa_defect', value: '"Cancelled - works on my machine"' },
     { key: 'date_format', value: 'DD/MM/YYYY (fight me)' },
   ],
 } as const

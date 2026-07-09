@@ -29,7 +29,7 @@ function App() {
         <Section id="experience" title="Experience" command="git log --experience">
           <Experience />
         </Section>
-        <Section id="stack" title="Toolkit" command="cat stack.json">
+        <Section id="stack" title="Tech Stack" command="cat stack.json">
           <Stack />
         </Section>
       </main>
