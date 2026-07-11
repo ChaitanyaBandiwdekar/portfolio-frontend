@@ -3,11 +3,17 @@ import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 import {
   ERROR_MOOD_MS,
   errorSignal,
+  DIZZY_MS,
+  dizzySignal,
+  TYPING_MOOD_MS,
+  typingSignal,
   getEmote,
   getMoodState,
   NEUTRAL_EMOTES,
   setEmote,
   subscribeMood,
+  WAKE_SHOCK_MS,
+  wakeSignal,
   type Emote,
 } from '../../lib/chat/activity'
 import { ELLIPSIS_DOTS, GLYPHS, type GlyphName } from './moodSprites'
@@ -21,7 +27,7 @@ function PixelGlyph({ name, animateSwap }: { name: GlyphName; animateSwap: boole
       key={name}
       viewBox="0 0 12 12"
       shapeRendering="crispEdges"
-      className={`size-6 max-lg:size-4 ${animateSwap ? 'mood-glyph-enter' : ''}`}
+      className={`size-6 max-lg:size-4 ${animateSwap ? 'mood-glyph-enter' : ''} ${name === 'dizzy' && animateSwap ? 'mood-glyph-dizzy' : ''}`}
     >
       {GLYPHS[name].map(([x, y]) => (
         <rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} fill="currentColor" />
@@ -84,8 +90,46 @@ export function MoodBadge() {
     return () => window.clearTimeout(id)
   }, [mood])
 
+  // useSyncExternalStore won't re-fire when the dizzy window simply lapses — force a re-resolve when it does
+  useEffect(() => {
+    if (mood !== 'dizzy') return
+    const remaining = Math.max(0, DIZZY_MS - (performance.now() - dizzySignal.at))
+    const id = window.setTimeout(() => forceTick((n) => n + 1), remaining)
+    return () => window.clearTimeout(id)
+  }, [mood])
+
+  // useSyncExternalStore won't re-fire when the shock window simply lapses — force a re-resolve when it does
+  useEffect(() => {
+    if (mood !== 'shock') return
+    const remaining = Math.max(0, WAKE_SHOCK_MS - (performance.now() - wakeSignal.at))
+    const id = window.setTimeout(() => forceTick((n) => n + 1), remaining)
+    return () => window.clearTimeout(id)
+  }, [mood])
+
+  // same for the typing window behind the focus mood; keyed on the timestamp so each keystroke re-arms the timer
+  const typingAt = useSyncExternalStore(subscribeMood, () => typingSignal.at, () => 0)
+  useEffect(() => {
+    if (mood !== 'focus') return
+    const remaining = TYPING_MOOD_MS - (performance.now() - typingAt)
+    if (remaining <= 0) return
+    const id = window.setTimeout(() => forceTick((n) => n + 1), remaining)
+    return () => window.clearTimeout(id)
+  }, [mood, typingAt])
+
   const glyphName: GlyphName | 'ellipsis' =
-    mood === 'error' ? 'sad' : mood === 'thinking' ? 'ellipsis' : mood === 'hover' ? 'heart' : emote
+    mood === 'error'
+      ? 'sad'
+      : mood === 'dizzy'
+        ? 'dizzy'
+        : mood === 'thinking'
+          ? 'ellipsis'
+          : mood === 'shock'
+            ? 'surprised'
+            : mood === 'focus'
+              ? 'question'
+              : mood === 'hover'
+                ? 'heart'
+                : emote
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute top-3 right-3 z-10 max-lg:top-2 max-lg:right-2">

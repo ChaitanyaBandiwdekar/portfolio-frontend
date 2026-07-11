@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
-import { setHover } from '../../lib/chat/activity'
+import { setHover, reportPointerMove } from '../../lib/chat/activity'
 import { Robot, pointerTarget, entrance } from './Robot'
 import { MoodBadge } from './MoodBadge'
 
@@ -24,8 +24,18 @@ export function RobotScene() {
     return () => io.disconnect()
   }, [])
 
+  const inViewRef = useRef(inView)
+  useEffect(() => {
+    inViewRef.current = inView
+  }, [inView])
+  const reducedMotionRef = useRef(reducedMotion)
+  useEffect(() => {
+    reducedMotionRef.current = reducedMotion
+  }, [reducedMotion])
+
   useEffect(() => {
     const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
+    const lastPos = { current: null as { x: number; y: number } | null }
     const onMove = (e: PointerEvent) => {
       const el = wrapRef.current
       if (!el) return
@@ -39,13 +49,25 @@ export function RobotScene() {
       const hoverRight = r.right - r.width * 0.15
       const hoverTop = r.top + r.height * 0.24
       const hoverBottom = r.bottom - r.height * 0.02
-      setHover(
-        e.clientX >= hoverLeft && e.clientX <= hoverRight && e.clientY >= hoverTop && e.clientY <= hoverBottom,
-      )
+      const overRobot =
+        e.clientX >= hoverLeft && e.clientX <= hoverRight && e.clientY >= hoverTop && e.clientY <= hoverBottom
+      setHover(overRobot)
+      // dizzy only accumulates while playing with the robot itself, not from page-wide pointer travel
+      if (overRobot && !reducedMotionRef.current && inViewRef.current) {
+        if (lastPos.current) {
+          const dx = e.clientX - lastPos.current.x
+          const dy = e.clientY - lastPos.current.y
+          reportPointerMove(Math.hypot(dx, dy))
+        }
+        lastPos.current = { x: e.clientX, y: e.clientY }
+      } else {
+        lastPos.current = null
+      }
     }
     const onLeave = () => {
       pointerTarget.active = false
       setHover(false)
+      lastPos.current = null
     }
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerout', onLeave)

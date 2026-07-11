@@ -2,7 +2,21 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Group, Mesh, MeshStandardMaterial } from 'three'
-import { chatActivity, errorSignal, ERROR_MOOD_MS, hoverTarget, getEmote } from '../../lib/chat/activity'
+import {
+  chatActivity,
+  errorSignal,
+  ERROR_MOOD_MS,
+  hoverTarget,
+  inputSignal,
+  typingSignal,
+  TYPING_MOOD_MS,
+  dizzySignal,
+  DIZZY_MS,
+  getEmote,
+  wakeSignal,
+  WAKE_SHOCK_MS,
+  isAsleep,
+} from '../../lib/chat/activity'
 
 /** Normalized pointer (-1..1, clamped to ±1.6) shared via module scope; written by RobotScene's window listener. */
 // eslint-disable-next-line react-refresh/only-export-components -- shared mutable state, not a component
@@ -22,6 +36,7 @@ const EYE_THINKING_SCALE = 0.45
 const MOOD_DAMP = 8
 const MOOD_PITCH_HAPPY = -0.14 // head lifts on happy
 const MOOD_PITCH_SAD = 0.22 // head droops on sad
+const DIZZY_SPEED = 2.2 // rad/s, orbit speed of the woozy loll
 
 export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
   const entranceGroup = useRef<Group>(null)
@@ -39,6 +54,8 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
   const moodValue = useRef(0) // -1 sad .. 0 neutral .. 1 happy
   // neutral-only emote expression, damped rather than snapped; only meaningful while mood is neutral
   const emoteExpr = useRef({ happy: 0, eyeX: 1, eyeY: 1, chestBoost: 0, pitchExtra: 0, tilt: 0 })
+  const dizzyWeight = useRef(0)
+  const spinPhase = useRef(0)
 
   useFrame(({ clock }, delta) => {
     const t = clock.elapsedTime
@@ -46,13 +63,23 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
 
     const p = entrance.progress
 
-    // mood: error (sad) beats hover (happy) beats neutral; damped so it eases, not snaps
+    // mood: error (sad) beats dizzy beats thinking beats focus (question) beats hover (happy) beats neutral
     const errorActive = performance.now() - errorSignal.at < ERROR_MOOD_MS
-    const moodTargetRaw = errorActive ? -1 : hoverTarget.active ? 1 : 0
+    const dizzyActive = performance.now() - dizzySignal.at < DIZZY_MS
+    const inputActive = inputSignal.hovered || performance.now() - typingSignal.at < TYPING_MOOD_MS
+    const focusActive = inputActive && !errorActive && !dizzyActive
+    const shockActive = wakeSignal.at > 0 && performance.now() - wakeSignal.at < WAKE_SHOCK_MS && !errorActive && !dizzyActive
+    const sleeping = isAsleep()
+    const dizzyWeightTarget = dizzyActive && !reducedMotion ? 1 : 0
+    dizzyWeight.current = THREE.MathUtils.damp(dizzyWeight.current, dizzyWeightTarget, MOOD_DAMP, delta)
+    if (dizzyWeight.current > 0.001 && !reducedMotion) {
+      spinPhase.current += delta * DIZZY_SPEED
+    }
+    const moodTargetRaw = errorActive ? -1 : hoverTarget.active && !focusActive && !shockActive ? 1 : 0
     moodValue.current = THREE.MathUtils.damp(moodValue.current, moodTargetRaw, MOOD_DAMP, delta)
 
-    // neutral emote: only fills the slot when error/hover/thinking aren't already claiming the face
-    const isNeutral = !errorActive && !hoverTarget.active && !chatActivity.streaming
+    // neutral emote: only fills the slot when error/hover/thinking/focus aren't already claiming the face
+    const isNeutral = !errorActive && !hoverTarget.active && !chatActivity.streaming && !focusActive
     let emoteHappyTarget = 0
     let eyeXTarget = 1
     let eyeYTarget = 1
@@ -60,7 +87,17 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
     let pitchTarget = 0
     let tiltTarget = 0
     let lookAround = false
-    if (isNeutral) {
+    if (shockActive) {
+      eyeXTarget = 1.4
+      eyeYTarget = 1.4
+      chestTarget = 0.95
+      pitchTarget = -0.1
+    } else if (focusActive) {
+      tiltTarget = 0.24
+      eyeXTarget = 1.1
+      eyeYTarget = 1.15
+      pitchTarget = -0.08 // small upward pitch, curiosity
+    } else if (isNeutral) {
       switch (getEmote()) {
         case 'smiley':
           emoteHappyTarget = 1
@@ -103,7 +140,7 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
     emoteExpr.current.chestBoost = THREE.MathUtils.damp(emoteExpr.current.chestBoost, chestTarget, MOOD_DAMP, delta)
     emoteExpr.current.pitchExtra = THREE.MathUtils.damp(emoteExpr.current.pitchExtra, pitchTarget, MOOD_DAMP, delta)
     emoteExpr.current.tilt = THREE.MathUtils.damp(emoteExpr.current.tilt, tiltTarget, MOOD_DAMP, delta)
-    const suppressBlink = isNeutral && getEmote() === 'zzz'
+    const suppressBlink = (isNeutral && getEmote() === 'zzz') || dizzyActive
 
     if (entranceGroup.current) {
       entranceGroup.current.position.y = (1 - p) * -2.4 // rises from below the frame
@@ -125,7 +162,7 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
     // head tracking (disabled under reduced motion)
     let targetYaw = 0
     let targetPitch = 0
-    if (!reducedMotion) {
+    if (!reducedMotion && !sleeping) {
       if (pointerTarget.active) {
         targetYaw = pointerTarget.x * HEAD_YAW_RANGE
         targetPitch = pointerTarget.y * HEAD_PITCH_RANGE
@@ -141,9 +178,16 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
     targetPitch *= p
     targetPitch += MOOD_PITCH_HAPPY * happyWeight + MOOD_PITCH_SAD * sadWeight
     targetPitch += emoteExpr.current.pitchExtra
+    let tiltTargetDamped = emoteExpr.current.tilt * p
+    if (dizzyWeight.current > 0.001 && !reducedMotion) {
+      const w = dizzyWeight.current
+      targetYaw = THREE.MathUtils.lerp(targetYaw, Math.cos(spinPhase.current) * 0.5, w)
+      targetPitch = THREE.MathUtils.lerp(targetPitch, Math.sin(spinPhase.current) * 0.28, w)
+      tiltTargetDamped += Math.sin(spinPhase.current) * 0.28 * w
+    }
     head.current.rotation.y = THREE.MathUtils.damp(head.current.rotation.y, targetYaw, DAMP_LAMBDA, delta)
     head.current.rotation.x = THREE.MathUtils.damp(head.current.rotation.x, targetPitch, DAMP_LAMBDA, delta)
-    head.current.rotation.z = THREE.MathUtils.damp(head.current.rotation.z, emoteExpr.current.tilt * p, DAMP_LAMBDA, delta)
+    head.current.rotation.z = THREE.MathUtils.damp(head.current.rotation.z, tiltTargetDamped, DAMP_LAMBDA, delta)
     // torso follows the head a little — feels alive, not mechanical
     root.current.rotation.y = THREE.MathUtils.damp(root.current.rotation.y, targetYaw * 0.18, DAMP_LAMBDA, delta)
 
@@ -164,7 +208,7 @@ export function Robot({ reducedMotion }: { reducedMotion: boolean }) {
       }
     }
 
-    const eyeScaleY = restEyeScaleY.current * blinkFactor
+    const eyeScaleY = restEyeScaleY.current * blinkFactor * (1 - dizzyWeight.current * 0.92)
     leftEye.current?.scale.set(dotWeight * emoteExpr.current.eyeX, dotWeight * eyeScaleY * emoteExpr.current.eyeY, dotWeight * 0.35)
     rightEye.current?.scale.set(dotWeight * emoteExpr.current.eyeX, dotWeight * eyeScaleY * emoteExpr.current.eyeY, dotWeight * 0.35)
     leftHappy.current?.scale.setScalar(happyWeight)

@@ -179,8 +179,15 @@
   }
   .mood-glyph-enter { animation: mood-glyph-enter 0.25s ease; }
 
+  @keyframes mood-glyph-dizzy {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .mood-glyph-dizzy { animation: mood-glyph-dizzy 1.8s linear infinite; }
+
   @media (prefers-reduced-motion: reduce) {
     .mood-dot-0, .mood-dot-1, .mood-dot-2 { animation: none; opacity: 1; }
     .mood-glyph-enter { animation: none; }
+    .mood-glyph-dizzy { animation: none; }
   }
 }

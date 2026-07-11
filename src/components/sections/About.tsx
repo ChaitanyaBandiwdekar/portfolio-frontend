@@ -7,8 +7,8 @@ export function About() {
   useReveal(ref)
 
   return (
-    <div ref={ref} className="grid gap-12 lg:grid-cols-[minmax(0,60fr)_minmax(0,40fr)] lg:gap-20">
-      <div className="max-w-[65ch] space-y-6">
+    <div ref={ref} className="grid gap-12 lg:grid-cols-[minmax(0,55fr)_minmax(0,45fr)] lg:gap-20">
+      <div className="space-y-6">
         {about.paragraphs.map((p, i) => (
           <p key={i} data-reveal className="text-body text-ink" style={{ textWrap: 'pretty' }}>
             {p}
@@ -19,7 +19,7 @@ export function About() {
         {about.facts.map((fact) => (
           <div key={fact.key} className="flex flex-wrap justify-between gap-x-6 gap-y-1">
             <dt className="text-muted">{fact.key}</dt>
-            <dd className="text-ink">{fact.value}</dd>
+            <dd className="ml-auto max-w-[30ch] text-right text-ink">{fact.value}</dd>
           </div>
         ))}
       </dl>

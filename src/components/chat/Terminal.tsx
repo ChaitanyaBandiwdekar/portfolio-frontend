@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { setStreaming, flagError } from '../../lib/chat/activity'
+import { setStreaming, flagError, setInputHovered, reportTyping } from '../../lib/chat/activity'
 import { streamChat } from '../../lib/chat/client'
 import { runCommand } from '../../lib/chat/commands'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
@@ -175,7 +175,12 @@ export function Terminal() {
           ref={inputRef}
           value={input}
           disabled={busy}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value)
+            reportTyping()
+          }}
+          onPointerEnter={() => setInputHovered(true)}
+          onPointerLeave={() => setInputHovered(false)}
           onKeyDown={(e) => {
             if (e.key === 'ArrowUp' && history.length > 0) {
               e.preventDefault()

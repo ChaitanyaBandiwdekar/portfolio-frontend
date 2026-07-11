@@ -38,6 +38,7 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
   const [skipped] = useState(() => shouldSkip(reducedMotion))
   const [rendered, setRendered] = useState<string[]>([])
   const [leaving, setLeaving] = useState(false)
+  const [gone, setGone] = useState(false)
   const doneRef = useRef(false)
 
   useEffect(() => {
@@ -54,7 +55,12 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
       doneRef.current = true
       sessionStorage.setItem('booted', '1')
       setLeaving(true)
-      timeouts.push(window.setTimeout(onDone, 400)) // matches CSS fade duration
+      timeouts.push(
+        window.setTimeout(() => {
+          setGone(true)
+          onDone()
+        }, 400), // matches CSS fade duration
+      )
     }
 
     const skipHandler = () => finish()
@@ -99,13 +105,17 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skipped])
 
-  if (skipped) return null
+  if (skipped || gone) return null
 
   return (
     <div
       aria-hidden="true"
       className="fixed inset-0 flex items-center justify-center bg-bg transition-opacity duration-400"
-      style={{ zIndex: 'var(--z-modal)', opacity: leaving ? 0 : 1 }}
+      style={{
+        zIndex: 'var(--z-modal)',
+        opacity: leaving ? 0 : 1,
+        pointerEvents: leaving ? 'none' : 'auto',
+      }}
     >
       <div className="w-full max-w-3xl px-[var(--gutter)] font-mono text-mono text-term-green max-sm:text-mono-sm">
         {rendered.map((line, i) => (
