@@ -19,8 +19,25 @@ export function Nav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[var(--container)] items-center justify-between px-[var(--gutter)] py-3"
       >
-        <a href="#hero" className="font-mono text-mono-sm text-muted hover:text-ink">
-          <LetterSwap label="~/portfolio" />
+        <a
+          href="#hero"
+          className="flex items-center gap-2.5 font-mono text-mono-sm text-muted hover:text-ink"
+        >
+          {/* brand mark: <cb/> (same geometry as /favicon.svg, minus the tile) */}
+          <svg viewBox="7 25 88 38" className="h-[1.125rem] w-auto" aria-hidden="true">
+            <g fill="none" strokeWidth="5">
+              <g stroke="var(--color-muted)">
+                <path d="M19 37.5 10 48 19 58.5" />
+                <path d="M81 37.5 90 48 81 58.5" />
+              </g>
+              <g stroke="var(--color-ink)">
+                <path d="M41 38.5H34Q28.5 38.5 28.5 43V53Q28.5 57.5 34 57.5H41" />
+                <path d="M47.5 26V60" />
+                <path d="M47.5 38.5H55Q60.5 38.5 60.5 43V53Q60.5 57.5 55 57.5H47.5" />
+              </g>
+              <path d="M66.5 62 74.5 34" stroke="var(--color-primary)" />
+            </g>
+          </svg>
         </a>
         <ul className="flex gap-5 max-sm:gap-3">
           {LINKS.map((link) => (

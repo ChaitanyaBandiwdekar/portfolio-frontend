@@ -6,31 +6,38 @@ export type StackGroup = {
 // TODO(owner): make this true. Only list what you'd defend in an interview.
 export const stack: StackGroup[] = [
   {
-    group: 'languages',
+    group: 'Languages',
     entries: [
-      { name: 'typescript', version: '^5.x' },
-      { name: 'python', version: '^3.12' },
+      { name: 'TypeScript', version: '^5.x' },
+      { name: 'Java', version: '^3.12' },
+      { name: 'Python', version: '^3.12' },
     ],
   },
   {
-    group: 'frontend',
+    group: 'Frameworks & Libraries',
     entries: [
-      { name: 'react', version: '^19' },
-      { name: 'tailwindcss', version: '^4' },
+      { name: 'React', version: '^19' },
+      { name: 'Node.js', version: '^22' },
+      { name: 'Spring Boot', version: '^3.1' },
+      { name: 'FastAPI', version: '^0.100' }
     ],
   },
   {
-    group: 'backend',
+    group: 'DevOps & Technologies',
     entries: [
-      { name: 'node', version: '^22' },
-      { name: 'postgres', version: '^16' },
+      { name: 'Kubernetes', version: '^22' },
+      { name: 'Jenkins', version: '^16' },
+      { name: 'Splunk', version: '^24' },
+      { name: 'GraphQL', version: '^16' },
+      { name: 'Apache Kafka', version: '^3.5' },
     ],
   },
   {
     group: 'peerDependencies',
     entries: [
       { name: 'coffee', version: '^∞.0.0' },
-      { name: 'rubber-duck', version: '1.0.0 (load-bearing)' },
+      { name: 'rubber-duck-programming', version: '1.0.0 (load-bearing)' },
+      { name: 'agent-chat-window (optional)', version: '1.0.0' }
     ],
   },
 ]

@@ -10,20 +10,28 @@ export type Project = {
 
 // TODO(owner): replace with 3–6 real projects, best first.
 export const projects: Project[] = [
-  {
-    slug: 'placeholder-project',
+{
+    slug: 'jira-triage-agent',
     year: '2026',
-    summary: 'one-line summary of what it is and why it mattered',
+    summary: 'Agentic pipeline that reasons over a cross-repo knowledge graph to triage and resolve tickets.',
     description:
-      'Two or three sentences: the problem, what you built, one concrete outcome or number. No adjectives without evidence.',
-    stack: ['typescript', 'react', 'postgres'],
-    links: [{ label: 'source', href: 'https://github.com/your-handle/placeholder' }],
+      'Manual Jira triage across large codebases is slow because engineers lack cross-repo context on ticket impact. Built a knowledge graph from multi-repo AST parsing (extended Graphify pipeline) paired with Claude-powered analysis via a self-built LLM proxy, routing simple tickets to a code-gen agent and generating structured RCA comments with impacted files and fixes for complex ones.',
+    stack: ['python', 'fastapi', 'litellm', 'graphify', 'reactjs', 'sqlite'],
     perms: 'drwxr-xr-x',
   },
   {
-    slug: 'second-placeholder',
+    slug: 'autonomous-code-coverage-engine',
     year: '2025',
-    summary: 'another one-liner',
+    summary: 'Parallelized multi-agent system that writes and self-corrects its own tests to improve code coverage.',
+    description:
+      'Legacy codebases often carry low test coverage that manual writing can\'t close fast enough. Built a test generation engine running 8 concurrent Claude agents in a generate-execute-self-correct loop with Jest execution and error reinjection (max 5 retries), lifting coverage 75%→95% on a greenfield service and auto-raising Bitbucket PRs with file-level coverage deltas.',
+    stack: ['python', 'fastapi', 'litellm'],
+    perms: 'drwxr-x---',
+  },
+  {
+    slug: 'portfolio-website',
+    year: '2025',
+    summary: 'Another one-liner',
     description: 'Same structure as above.',
     stack: ['python', 'fastapi'],
     links: [{ label: 'source', href: 'https://github.com/your-handle/second' }],

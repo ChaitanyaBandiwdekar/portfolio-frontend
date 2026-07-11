@@ -17,22 +17,20 @@ export function Stack() {
               {stack.map((group, gi) => (
                 <span key={group.group}>
                   {'\n  '}
-                  <span className="text-term-green">"{group.group}"</span>
-                  <span className="text-muted">: {'{'}</span>
+                  <span className="text-primary-bright">"{group.group}"</span>
+                  <span className="text-muted">: {'['}</span>
+                  {'\n    '}
                   {group.entries.map((entry, ei) => (
                     <span key={entry.name}>
-                      {'\n    '}
                       <span className="text-ink">"{entry.name}"</span>
-                      <span className="text-muted">: </span>
-                      <span className="text-term-amber">"{entry.version}"</span>
                       <span className="text-muted">
-                        {ei < group.entries.length - 1 ? ',' : ''}
+                        {ei < group.entries.length - 1 ? ', ' : ''}
                       </span>
                     </span>
                   ))}
                   {'\n  '}
                   <span className="text-muted">
-                    {'}'}
+                    {']'}
                     {gi < stack.length - 1 ? ',' : ''}
                   </span>
                 </span>

@@ -39,11 +39,11 @@ export function Projects() {
               <div className="expandable" data-open={isOpen}>
                 <div>
                   <div className="grid gap-6 pb-6 pl-0 sm:pl-[7.5rem] lg:grid-cols-[minmax(0,1fr)_auto]">
-                    <p className="max-w-[60ch] text-small text-ink">{project.description}</p>
-                    <div className="font-mono text-mono-sm">
+                    <p className="text-small text-ink">{project.description}</p>
+                    <div className="max-w-[30ch] font-mono text-mono-sm">
                       <p className="text-muted">{project.stack.join(' · ')}</p>
                       <p className="mt-2 flex gap-4">
-                        {project.links.map((link) => (
+                        {project.links && project.links.map((link) => (
                           <a
                             key={link.href}
                             href={link.href}
