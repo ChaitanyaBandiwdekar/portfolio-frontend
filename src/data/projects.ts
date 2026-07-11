@@ -17,6 +17,7 @@ export const projects: Project[] = [
     description:
       'Manual Jira triage across large codebases is slow because engineers lack cross-repo context on ticket impact. Built a knowledge graph from multi-repo AST parsing (extended Graphify pipeline) paired with Claude-powered analysis via a self-built LLM proxy, routing simple tickets to a code-gen agent and generating structured RCA comments with impacted files and fixes for complex ones.',
     stack: ['python', 'fastapi', 'litellm', 'graphify', 'reactjs', 'sqlite'],
+    links: [],
     perms: 'drwxr-xr-x',
   },
   {
@@ -26,6 +27,7 @@ export const projects: Project[] = [
     description:
       'Legacy codebases often carry low test coverage that manual writing can\'t close fast enough. Built a test generation engine running 8 concurrent Claude agents in a generate-execute-self-correct loop with Jest execution and error reinjection (max 5 retries), lifting coverage 75%→95% on a greenfield service and auto-raising Bitbucket PRs with file-level coverage deltas.',
     stack: ['python', 'fastapi', 'litellm'],
+    links: [],
     perms: 'drwxr-x---',
   },
   {
