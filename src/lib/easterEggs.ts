@@ -7,7 +7,7 @@ export function installEasterEggs(): void {
     'font-family: monospace; color: oklch(0.74 0.15 355);',
   )
   console.log(
-    `%cthe interesting parts: the robot is raw three.js primitives, the background is a seeded curl-noise field, and the terminal actually parses SSE. source: ${site.github}`,
+    `%cthe interesting parts: the robot is raw three.js primitives, the background is a CSS-masked crosshair lattice, and the terminal actually parses SSE. source: ${site.github}`,
     'font-family: monospace; color: oklch(0.68 0.01 355);',
   )
 }
