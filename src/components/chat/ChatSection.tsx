@@ -63,7 +63,7 @@ export function ChatSection() {
                   />
                   agent active
                 </p>
-                <p className="mt-1 text-muted">v0.0.1 · gpt-4.1 (that's what i could afford)</p>
+                <p className="mt-1 text-muted">v0.0.1 · gpt-4o (that's what i could afford)</p>
               </div>
             </div>
             <Terminal />

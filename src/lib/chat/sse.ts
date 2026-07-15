@@ -1,27 +1,25 @@
 export type ChatEvent =
   | { type: 'token'; text: string }
-  | { type: 'done'; sessionId: string }
+  | { type: 'done' }
   | { type: 'error'; message: string }
 
 function parseBlock(block: string): ChatEvent | null {
-  let event = ''
   let data = ''
   for (const rawLine of block.split('\n')) {
     const line = rawLine.replace(/\r$/, '')
-    if (line.startsWith('event:')) event = line.slice(6).trim()
-    else if (line.startsWith('data:')) data += line.slice(5).trim()
+    if (line.startsWith('data:')) data += line.slice(5).trim()
   }
-  if (!event || !data) return null
+  if (!data) return null
   try {
     const parsed = JSON.parse(data) as Record<string, unknown>
-    if (event === 'token' && typeof parsed.text === 'string') {
+    if (parsed.type === 'token' && typeof parsed.text === 'string') {
       return { type: 'token', text: parsed.text }
     }
-    if (event === 'done' && typeof parsed.session_id === 'string') {
-      return { type: 'done', sessionId: parsed.session_id }
+    if (parsed.type === 'done') {
+      return { type: 'done' }
     }
-    if (event === 'error' && typeof parsed.message === 'string') {
-      return { type: 'error', message: parsed.message }
+    if (parsed.type === 'error' && typeof parsed.text === 'string') {
+      return { type: 'error', message: parsed.text }
     }
   } catch {
     return null

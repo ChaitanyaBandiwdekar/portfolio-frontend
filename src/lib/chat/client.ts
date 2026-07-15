@@ -1,12 +1,11 @@
 import { createSSEBuffer, type ChatEvent } from './sse'
+import { CHAT_API_URL } from './config'
 
-const IDLE_TIMEOUT_MS = 30_000
+const IDLE_TIMEOUT_MS = 90_000
 
-async function* streamReal(
-  baseUrl: string,
-  message: string,
-  sessionId: string | null,
-): AsyncGenerator<ChatEvent> {
+type Message = { role: 'user' | 'assistant'; content: string }
+
+async function* streamReal(baseUrl: string, messages: Message[]): AsyncGenerator<ChatEvent> {
   const controller = new AbortController()
   let idleTimer = setTimeout(() => controller.abort(), IDLE_TIMEOUT_MS)
   const resetIdle = () => {
@@ -18,11 +17,19 @@ async function* streamReal(
     const res = await fetch(`${baseUrl.replace(/\/$/, '')}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, session_id: sessionId }),
+      body: JSON.stringify({ messages: messages.slice(-10) }),
       signal: controller.signal,
     })
+    if (res.status === 429) {
+      yield {
+        type: 'error',
+        message:
+          "Whoa, speed run! You've hit the rate limit — give it a minute (or a day, if you've really been going).",
+      }
+      return
+    }
     if (!res.ok || !res.body) {
-      yield { type: 'error', message: `backend replied ${res.status} — try again in a bit` }
+      yield { type: 'error', message: `Backend replied ${res.status} — try again in a bit` }
       return
     }
     const reader = res.body.getReader()
@@ -63,29 +70,53 @@ const MOCK_REPLIES: Array<{ match: RegExp; reply: string }> = [
   {
     match: /who|about|you/i,
     reply:
-      "I'm the placeholder brain. The production model reads the owner's actual documents; I read a hardcoded array. We can't all be RAG pipelines.",
+      "I'm the placeholder. The production version actually reads documents; I just read whatever's hardcoded in this array. Not exactly a RAG pipeline over here.",
   },
 ]
 
 const MOCK_FALLBACK =
   "mock mode: the real backend isn't connected (VITE_CHAT_API_URL is unset). I have exactly three canned answers and that wasn't one of them."
 
-async function* streamMock(message: string): AsyncGenerator<ChatEvent> {
-  const reply = MOCK_REPLIES.find((r) => r.match.test(message))?.reply ?? MOCK_FALLBACK
-  // stream word-by-word so the terminal's streaming path is exercised
-  for (const word of reply.split(/(?<=\s)/)) {
-    await new Promise((resolve) => setTimeout(resolve, 24))
-    yield { type: 'token', text: word }
-  }
-  yield { type: 'done', sessionId: 'mock-session' }
+async function* streamMock(messages: Message[]): AsyncGenerator<ChatEvent> {
+  const lastUser = [...messages].reverse().find((m) => m.role === 'user')
+  const reply = MOCK_REPLIES.find((r) => r.match.test(lastUser?.content ?? ''))?.reply ?? MOCK_FALLBACK
+  // no pacing here — paceStream handles the typewriter feel for real and mock alike
+  yield { type: 'token', text: reply }
+  yield { type: 'done' }
 }
 
-export function streamChat(
-  message: string,
-  sessionId: string | null,
-): AsyncGenerator<ChatEvent> {
-  const baseUrl = import.meta.env.VITE_CHAT_API_URL as string | undefined
-  return baseUrl ? streamReal(baseUrl, message, sessionId) : streamMock(message)
+// ---- presentation pacing ----
+// Even when the backend answers instantly, hold a short "thinking" beat before the
+// first token, then drip the text word-by-word so replies read as typed, not dumped.
+
+const MIN_THINK_MS = 800
+const WORD_DELAY_MS = 28
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export async function* paceStream(source: AsyncGenerator<ChatEvent>): AsyncGenerator<ChatEvent> {
+  const started = Date.now()
+  let firstToken = true
+  for await (const event of source) {
+    if (event.type !== 'token') {
+      yield event
+      continue
+    }
+    if (firstToken) {
+      firstToken = false
+      const remaining = MIN_THINK_MS - (Date.now() - started)
+      if (remaining > 0) await sleep(remaining)
+    }
+    for (const word of event.text.split(/(?<=\s)/)) {
+      if (!word) continue
+      yield { type: 'token', text: word }
+      await sleep(WORD_DELAY_MS)
+    }
+  }
+}
+
+export function streamChat(messages: Message[]): AsyncGenerator<ChatEvent> {
+  return CHAT_API_URL ? streamReal(CHAT_API_URL, messages) : streamMock(messages)
 }
 
 export type { ChatEvent }

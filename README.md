@@ -91,32 +91,34 @@ sprites. The terminal has a local command router for client-side commands.
 POST {VITE_CHAT_API_URL}/chat
 Content-Type: application/json
 
-{ "message": "...", "session_id": "..." }
+{ "messages": [ { "role": "user" | "assistant", "content": "..." }, ... ] }
 ```
 
-Response is `text/event-stream`: zero or more
+The client sends the running conversation, trimmed to the last 10 messages; each message is
+capped at 2000 characters. There is no `session_id` — the backend is stateless per request.
+
+Response is `text/event-stream` with data-only events (no `event:` line): zero or more
 
 ```
-event: token
-data: {"text": "..."}
+data: {"type": "token", "text": "..."}
 ```
 
 followed by exactly one of
 
 ```
-event: done
-data: {"session_id": "..."}
+data: {"type": "done", "text": ""}
 ```
 
 or
 
 ```
-event: error
-data: {"message": "..."}
+data: {"type": "error", "text": "..."}
 ```
 
-`session_id` is kept in memory only, with a 30s idle timeout. When `VITE_CHAT_API_URL` is
-unset, a mock client streams canned replies word-by-word instead.
+A plain HTTP 429 (JSON, not SSE) means the per-IP rate limit was hit (5/min, 30/day). The
+backend runs on a free-tier host and cold-starts (~30-60s) after inactivity; `main.tsx` fires
+an unawaited `GET {VITE_CHAT_API_URL}/health` ping on load to help warm it up. When
+`VITE_CHAT_API_URL` is unset, a mock client streams canned replies word-by-word instead.
 
 ## getting started
 

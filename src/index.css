@@ -138,6 +138,32 @@
     .cursor-blink-line::after { animation: none; }
   }
 
+  /* Chat "thinking" indicator — three dots bouncing in sequence */
+  .typing-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    height: 1lh;
+  }
+  .typing-dot {
+    width: 0.32em;
+    height: 0.32em;
+    border-radius: 9999px;
+    background-color: var(--color-muted);
+    animation: typing-hop 0.9s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.12s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.24s; }
+
+  @keyframes typing-hop {
+    0%, 55%, 100% { transform: translateY(0); opacity: 0.35; }
+    25% { transform: translateY(-0.3em); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typing-dot { animation: none; opacity: 0.6; }
+  }
+
   @keyframes bob {
     0%, 100% { transform: translate(-50%, 0); }
     50% { transform: translate(-50%, 6px); }

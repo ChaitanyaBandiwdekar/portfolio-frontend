@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { setStreaming, flagError, setInputHovered, reportTyping } from '../../lib/chat/activity'
-import { streamChat } from '../../lib/chat/client'
+import { paceStream, streamChat } from '../../lib/chat/client'
 import { runCommand } from '../../lib/chat/commands'
 import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion'
 
@@ -15,7 +15,7 @@ const GREETING: Entry[] = [
   {
     id: GREETING_ID,
     kind: 'bot',
-    text: "hi — i'm an agent for chaitanya. ask about projects, architecture, or tech stacks. i have read all the documents. all of them.",
+    text: "Hi — I'm here on behalf of Chaitanya. Ask about past projects, technologies used or work experience. Happy to answer!",
     streaming: false,
   },
 ]
@@ -30,7 +30,8 @@ export function Terminal() {
   const [busy, setBusy] = useState(false)
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
-  const sessionIdRef = useRef<string | null>(null)
+  const [wakingUp, setWakingUp] = useState(false)
+  const convoRef = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const reducedMotion = usePrefersReducedMotion()
@@ -46,7 +47,7 @@ export function Terminal() {
     setEntries((prev) => [...prev, { ...entry, id: nextId++ } as Entry])
 
   const submit = async (chipText?: string) => {
-    const text = (chipText ?? input).trim()
+    const text = (chipText ?? input).trim().slice(0, 2000)
     if (!text || busy) return
     setInput('')
     setHistory((prev) => [text, ...prev].slice(0, 50))
@@ -74,22 +75,37 @@ export function Terminal() {
         ),
       )
 
+    convoRef.current.push({ role: 'user', content: text })
+
+    const wakeTimer = setTimeout(() => setWakingUp(true), 6000)
     setStreaming(true)
+    let erred = false
     try {
       let full = ''
-      for await (const event of streamChat(text, sessionIdRef.current)) {
+      const source = streamChat(convoRef.current)
+      for await (const event of reducedMotion ? source : paceStream(source)) {
         if (event.type === 'token') {
+          clearTimeout(wakeTimer)
+          setWakingUp(false)
           full += event.text
           if (!reducedMotion) patchBot(() => full, true)
         } else if (event.type === 'done') {
-          sessionIdRef.current = event.sessionId
+          // no-op: loop exits below
         } else {
+          erred = true
           full = full ? `${full}\n[error] ${event.message}` : `[error] ${event.message}`
           flagError()
         }
       }
       patchBot(() => full, false) // reduced motion: whole message lands at once
+      if (full && !erred) {
+        convoRef.current.push({ role: 'assistant', content: full })
+      } else {
+        convoRef.current.pop() // drop the failed user turn so a retry re-sends cleanly
+      }
     } finally {
+      clearTimeout(wakeTimer)
+      setWakingUp(false)
       setStreaming(false)
       setBusy(false)
     }
@@ -120,9 +136,22 @@ export function Terminal() {
                 </span>
                 <div className="max-w-[60ch] rounded border border-line bg-surface-2/60 px-3 py-2">
                   <p
-                    className={`whitespace-pre-wrap break-words text-ink ${entry.streaming ? 'cursor-blink' : ''}`}
+                    className={`whitespace-pre-wrap break-words text-ink ${entry.streaming && entry.text ? 'cursor-blink' : ''}`}
                   >
-                    {entry.text || (entry.streaming ? 'thinking…' : '')}
+                    {entry.text ||
+                      (entry.streaming ? (
+                        wakingUp ? (
+                          'backend is waking up — may take up to a minute…'
+                        ) : (
+                          <span className="typing-dots" role="status" aria-label="thinking">
+                            <span className="typing-dot" />
+                            <span className="typing-dot" />
+                            <span className="typing-dot" />
+                          </span>
+                        )
+                      ) : (
+                        ''
+                      ))}
                   </p>
                   {entry.id === GREETING_ID && (
                     <p className="mt-1 font-mono text-mono-sm text-muted">type `help` for commands.</p>
@@ -174,7 +203,7 @@ export function Terminal() {
           id="terminal-input"
           ref={inputRef}
           value={input}
-          disabled={busy}
+          readOnly={busy}
           onChange={(e) => {
             setInput(e.target.value)
             reportTyping()
@@ -196,6 +225,7 @@ export function Terminal() {
           }}
           autoComplete="off"
           spellCheck={false}
+          maxLength={2000}
           placeholder={busy ? 'thinking…' : 'ask me anything (or try `help`)'}
           className="w-full bg-transparent font-mono text-mono text-ink outline-none placeholder:text-muted"
           style={{ caretColor: 'var(--color-term-green)' }}
