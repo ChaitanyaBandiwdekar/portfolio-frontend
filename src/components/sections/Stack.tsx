@@ -11,7 +11,7 @@ export function Stack() {
     <div ref={ref} className="max-w-3xl">
       <div data-reveal>
         <TerminalWindow title="chaitbot: ~ — cat stack.json">
-          <pre className="overflow-x-auto px-5 py-4 font-mono text-mono leading-[1.9]">
+          <pre className="px-5 py-4 font-mono text-mono leading-[1.9] max-md:whitespace-pre-wrap max-md:break-words md:overflow-x-auto">
             <code>
               <span className="text-muted">{'{'}</span>
               {stack.map((group, gi) => (

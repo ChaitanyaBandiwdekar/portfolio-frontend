@@ -10,6 +10,16 @@ const LINES = [
   'ready........................ mostly.',
 ]
 
+// Terser equivalents so each line fits ~one line at 14px mono on narrow screens.
+const MOBILE_LINES = [
+  '$ ./portfolio --init',
+  'humour.js ...... ok (v2.1)',
+  'projects ..... mostly abandoned',
+  'eye contact .... skipped',
+  'bugs ........ features',
+  'ready.............. mostly.',
+]
+
 const CHAR_DELAY = 14 // ms per character
 const LINE_PAUSE = 90 // ms between lines
 const EXIT_DELAY = 350 // ms after last line before fade
@@ -36,6 +46,9 @@ function shouldSkip(reducedMotion: boolean): boolean {
 export function BootIntro({ onDone }: { onDone: () => void }) {
   const reducedMotion = usePrefersReducedMotion()
   const [skipped] = useState(() => shouldSkip(reducedMotion))
+  const [lines] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches ? MOBILE_LINES : LINES,
+  )
   const [rendered, setRendered] = useState<string[]>([])
   const [leaving, setLeaving] = useState(false)
   const [gone, setGone] = useState(false)
@@ -69,11 +82,11 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
 
     const typeLine = (lineIdx: number, charIdx: number) => {
       if (cancelled || doneRef.current) return
-      if (lineIdx >= LINES.length) {
+      if (lineIdx >= lines.length) {
         timeouts.push(window.setTimeout(finish, EXIT_DELAY))
         return
       }
-      const line = LINES[lineIdx]
+      const line = lines[lineIdx]
       setRendered((prev) => {
         const next = [...prev]
         next[lineIdx] = line.slice(0, charIdx)
@@ -83,7 +96,7 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
         let delay = CHAR_DELAY
         const dotRange = dotRunRange(line)
         if (dotRange && (charIdx === dotRange[0] || charIdx === dotRange[1])) {
-          const isLastLine = lineIdx === LINES.length - 1
+          const isLastLine = lineIdx === lines.length - 1
           delay += isLastLine
             ? randomBetween(LAST_LINE_DOT_PAUSE_MIN, LAST_LINE_DOT_PAUSE_MAX)
             : randomBetween(DOT_PAUSE_MIN, DOT_PAUSE_MAX)
@@ -117,7 +130,7 @@ export function BootIntro({ onDone }: { onDone: () => void }) {
         pointerEvents: leaving ? 'none' : 'auto',
       }}
     >
-      <div className="w-full max-w-3xl px-[var(--gutter)] font-mono text-mono text-term-green max-sm:text-mono-sm">
+      <div className="w-full max-w-3xl px-[var(--gutter)] font-mono text-mono text-term-green">
         {rendered.map((line, i) => (
           <p key={i} className={i === rendered.length - 1 ? 'cursor-blink' : undefined}>
             {line}

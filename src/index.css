@@ -68,6 +68,15 @@
   --z-toast: 60;
 }
 
+/* 14px type floor on small screens. --text-mono is already 0.9375rem (15px)
+   at all sizes, so only --text-mono-sm (0.8125rem / 13px) needs raising; its
+   line-height is unitless so it stays coherent automatically. */
+@media (max-width: 640px) {
+  :root {
+    --text-mono-sm: 0.875rem;
+  }
+}
+
 @layer base {
   html {
     background-color: var(--color-bg);
@@ -86,6 +95,10 @@
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     -webkit-font-smoothing: antialiased;
+    /* Long unbroken strings (URLs, identifiers) can't force page-level
+       horizontal scroll — only breaks when a word doesn't fit, never
+       mid-word otherwise. */
+    overflow-wrap: anywhere;
   }
 
   h1, h2, h3 {

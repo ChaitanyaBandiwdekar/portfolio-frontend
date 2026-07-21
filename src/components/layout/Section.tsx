@@ -62,12 +62,12 @@ export function Section({ id, title, command, children }: SectionProps) {
   return (
     <section
       id={id}
-      className="mx-auto flex min-h-svh w-full max-w-[var(--container)] flex-col justify-center px-[var(--gutter)] py-[calc(var(--space-section)/2)]"
+      className="mx-auto flex w-full max-w-[var(--container)] flex-col justify-center px-[var(--gutter)] py-[calc(var(--space-section)/4)] md:min-h-svh md:py-[calc(var(--space-section)/2)]"
     >
       <h2
         ref={headingRef}
         aria-label={title}
-        className="font-display text-h2 font-semibold text-ink mb-12"
+        className="font-display text-h2 font-semibold text-ink mb-6 md:mb-12"
       >
         <span ref={textRef} aria-hidden="true" className="inline-block">
           {title}

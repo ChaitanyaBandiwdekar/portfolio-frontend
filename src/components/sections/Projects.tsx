@@ -38,7 +38,7 @@ export function Projects() {
               </button>
               <div className="expandable" data-open={isOpen}>
                 <div>
-                  <div className="grid gap-6 pb-6 pl-0 sm:pl-[7.5rem] lg:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="grid gap-6 pb-6 pl-0 md:pl-[7.5rem] lg:grid-cols-[minmax(0,1fr)_auto]">
                     <p className="text-small text-ink">{project.description}</p>
                     <div className="max-w-[30ch] font-mono text-mono-sm">
                       <p className="text-muted">{project.stack.join(' · ')}</p>
@@ -49,7 +49,7 @@ export function Projects() {
                             href={link.href}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-primary-bright hover:underline"
+                            className="inline-flex min-h-11 items-center text-primary-bright hover:underline lg:min-h-0"
                           >
                             {link.label} ↗
                           </a>

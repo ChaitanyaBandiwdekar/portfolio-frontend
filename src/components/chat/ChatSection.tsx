@@ -42,8 +42,8 @@ export function ChatSection() {
         <TerminalWindow title="chaitbot:~zsh:80x24">
           <div className="lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
             {/* robot pane — the agent lives inside the window */}
-            <div className="flex flex-col border-line max-lg:border-b lg:border-r">
-              <div className="relative">
+            <div className="flex flex-col border-line max-lg:flex-row max-lg:items-center max-lg:gap-3 max-lg:border-b max-lg:px-3 max-lg:py-2 lg:border-r">
+              <div className="relative max-lg:size-[110px] max-lg:shrink-0 max-lg:overflow-hidden max-lg:rounded max-lg:border max-lg:border-line">
                 {/* soft stage glow behind the robot, contained in the pane */}
                 <div
                   aria-hidden="true"
@@ -55,7 +55,7 @@ export function ChatSection() {
                 />
                 <RobotScene />
               </div>
-              <div className="mt-auto px-4 py-3 font-mono text-mono-sm">
+              <div className="mt-auto px-4 py-3 font-mono text-mono-sm max-lg:mt-0 max-lg:flex-1 max-lg:px-0 max-lg:py-0">
                 <p className="flex items-center gap-2 text-ink">
                   <span
                     aria-hidden="true"

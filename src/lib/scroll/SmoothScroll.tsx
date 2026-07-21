@@ -4,6 +4,7 @@ import Snap from 'lenis/snap'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrefersReducedMotion } from '../usePrefersReducedMotion'
+import { setActiveLenis } from './scrollLock'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -11,9 +12,20 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
+    // Coarse-pointer/no-hover devices (touch) skip Lenis entirely — ScrollTrigger
+    // falls back to native scroll by default when no scrollerProxy/ticker is wired up.
     if (reducedMotion) return
 
+    // Real elapsed time drives the tweens on every device, not just the ones
+    // running Lenis — otherwise a phone that drops a >500ms frame gets GSAP's
+    // default lag clamping and the section-heading timelines crawl.
+    gsap.ticker.lagSmoothing(0)
+
+    const capable = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    if (!capable) return
+
     const lenis = new Lenis({ lerp: 0.1, anchors: true })
+    setActiveLenis(lenis)
     lenis.on('scroll', ScrollTrigger.update)
 
     // Exponential ease-out for a smooth, decisive snap settle.
@@ -48,13 +60,13 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
 
     const raf = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
 
     return () => {
       gsap.ticker.remove(raf)
       mq.removeEventListener('change', updateSnap)
       snap?.destroy()
       lenis.destroy()
+      setActiveLenis(null)
     }
   }, [reducedMotion])
 

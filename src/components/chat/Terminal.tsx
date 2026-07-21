@@ -31,10 +31,22 @@ export function Terminal() {
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
   const [wakingUp, setWakingUp] = useState(false)
+  // The full placeholder is wider than the input on a phone and truncates
+  // mid-hint, so drop the parenthetical there.
+  const [compact, setCompact] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches,
+  )
   const convoRef = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const reducedMotion = usePrefersReducedMotion()
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const onChange = () => setCompact(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   useEffect(() => {
     const el = scrollRef.current
@@ -122,7 +134,7 @@ export function Terminal() {
         role="log"
         aria-live="polite"
         aria-label="Chat transcript"
-        className="space-y-3 overflow-y-auto overscroll-contain px-4 py-3 max-lg:h-[16rem] lg:min-h-0 lg:flex-1"
+        className="space-y-3 overflow-y-auto overscroll-contain px-4 py-3 max-lg:h-[clamp(18rem,42dvh,30rem)] lg:min-h-0 lg:flex-1"
       >
         {entries.map((entry) => (
           <div key={entry.id}>
@@ -180,7 +192,7 @@ export function Terminal() {
                 type="button"
                 disabled={busy}
                 onClick={() => void submit(suggestion)}
-                className="rounded border border-line px-3 py-1.5 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50"
+                className="rounded border border-line px-3 py-1.5 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50 max-lg:flex max-lg:min-h-11 max-lg:items-center"
               >
                 {suggestion}
               </button>
@@ -224,19 +236,27 @@ export function Terminal() {
             }
           }}
           autoComplete="off"
+          autoCapitalize="none"
+          autoCorrect="off"
           spellCheck={false}
+          enterKeyHint="send"
           maxLength={2000}
-          placeholder={busy ? 'thinking…' : 'ask me anything (or try `help`)'}
-          className="w-full bg-transparent font-mono text-mono text-ink outline-none placeholder:text-muted"
+          placeholder={busy ? 'thinking…' : compact ? 'ask me anything' : 'ask me anything (or try `help`)'}
+          className="w-full bg-transparent font-mono text-[16px] text-ink outline-none placeholder:text-muted max-lg:min-h-11 sm:text-mono"
           style={{ caretColor: 'var(--color-term-green)' }}
         />
         <button
           type="submit"
           aria-label="Send"
           disabled={busy}
-          className="flex size-8 shrink-0 items-center justify-center rounded border border-line font-mono text-mono text-muted hover:bg-surface-2 disabled:opacity-50"
+          className="flex shrink-0 items-center justify-center disabled:opacity-50 max-lg:size-11 lg:size-8"
         >
-          ⏎
+          <span
+            aria-hidden="true"
+            className="flex size-8 items-center justify-center rounded border border-line font-mono text-mono text-muted hover:bg-surface-2"
+          >
+            ⏎
+          </span>
         </button>
       </form>
     </div>

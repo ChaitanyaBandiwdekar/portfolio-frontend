@@ -7,13 +7,13 @@ export function Experience() {
   useReveal(ref)
 
   return (
-    <ol ref={ref} className="relative ml-2 space-y-12 border-l border-line pl-8">
+    <ol ref={ref} className="relative ml-1 space-y-12 border-l border-line pl-5 sm:ml-2 sm:pl-8">
       {experience.map((role) => (
         <li key={role.hash} data-reveal className="relative">
           {/* commit dot on the line */}
           <span
             aria-hidden="true"
-            className="absolute -left-[2.4rem] top-1.5 size-3 rounded-full border-2 border-primary bg-bg"
+            className="absolute -left-[27px] top-1.5 size-3 rounded-full border-2 border-primary bg-bg sm:-left-[2.4rem]"
           />
           <p className="font-mono text-mono-sm text-muted">
             <span className="text-primary-bright">{role.hash}</span> · {role.range}

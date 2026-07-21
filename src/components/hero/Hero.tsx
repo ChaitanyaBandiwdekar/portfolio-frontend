@@ -52,17 +52,8 @@ export function Hero() {
     <section id="hero" ref={rootRef} className="relative flex min-h-svh items-center overflow-hidden">
       <BootIntro onDone={() => setBooted(true)} />
       <div ref={imageRef} data-hero-reveal aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
-        {/* mobile: dim ambient wash, kept behind the text rather than a second fold */}
-        <div className="absolute inset-0 md:hidden">
-          <img
-            src={heroImg}
-            alt=""
-            className="h-full w-full object-cover opacity-15"
-            style={{ filter: 'saturate(0.85) brightness(0.85) contrast(1.05)' }}
-          />
-          <div className="absolute inset-0 bg-bg/70" />
-        </div>
-        {/* desktop: full-bleed on the right, dissolving into the stage on its left edge */}
+        {/* desktop only: full-bleed on the right, dissolving into the stage on its left edge.
+            loading="lazy" keeps this from being requested on mobile, where it's hidden. */}
         <div
           className="absolute inset-y-0 right-0 hidden w-[60%] md:block"
           style={{
@@ -73,6 +64,7 @@ export function Hero() {
           <img
             src={heroImg}
             alt=""
+            loading="lazy"
             className="h-full w-full object-cover"
             style={{ filter: 'saturate(0.85) brightness(0.85) contrast(1.05)' }}
           />
@@ -81,7 +73,8 @@ export function Hero() {
       </div>
       <div
         ref={contentRef}
-        className="relative z-10 mx-auto w-full max-w-[var(--container)] px-[var(--gutter)] pt-16"
+        className="relative z-10 mx-auto w-full max-w-[var(--container)] px-[var(--gutter)]"
+        style={{ paddingTop: 'var(--nav-h, 4rem)' }}
       >
         <p data-hero-reveal className="mb-6 font-mono text-mono-sm text-muted">
           {site.location} · {site.status}
@@ -103,7 +96,9 @@ export function Hero() {
       <a
         href="#about"
         data-hero-reveal
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
+        // py-3 grows the tap target to a ≥44px hit area; bottom-5 (bottom-8 minus
+        // that same 12px) keeps the visible text at its original optical position.
+        className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 py-3 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
       >
         scroll ↓
       </a>

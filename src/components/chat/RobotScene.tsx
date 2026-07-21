@@ -13,6 +13,27 @@ export function RobotScene() {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
   const reducedMotion = usePrefersReducedMotion()
+  // pointer-fine + hover-capable devices only: touch has no resting pointer, so head
+  // tracking would otherwise get stuck at the last tap-drag angle (idiom: PatternGlow.tsx)
+  const [hoverCapable] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+  )
+  // coarse-pointer devices skip MSAA on the small compact-row canvas to save battery
+  const [coarsePointer] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches,
+  )
+  // below-lg the canvas is a compact square rather than a wide band — pull the
+  // camera back / widen the fov so the robot stays fully framed at that aspect
+  const [compactLayout, setCompactLayout] = useState(
+    () => typeof window !== 'undefined' && !window.matchMedia('(min-width: 1024px)').matches,
+  )
+
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => setCompactLayout(!mql.matches)
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
+  }, [])
 
   useEffect(() => {
     const el = wrapRef.current
@@ -34,6 +55,7 @@ export function RobotScene() {
   }, [reducedMotion])
 
   useEffect(() => {
+    if (!hoverCapable) return
     const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
     const lastPos = { current: null as { x: number; y: number } | null }
     const onMove = (e: PointerEvent) => {
@@ -75,7 +97,7 @@ export function RobotScene() {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerout', onLeave)
     }
-  }, [])
+  }, [hoverCapable])
 
   useEffect(() => {
     if (reducedMotion) {
@@ -102,13 +124,13 @@ export function RobotScene() {
     <div
       ref={wrapRef}
       aria-hidden="true"
-      className="relative h-[26rem] max-lg:h-[11rem]"
+      className="relative h-[26rem] max-lg:size-full"
     >
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, -0.1, 3.2], fov: 42 }}
+        camera={{ position: [0, -0.1, compactLayout ? 3.9 : 3.2], fov: compactLayout ? 50 : 42 }}
         frameloop={inView ? 'always' : 'never'}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: !coarsePointer, alpha: true }}
       >
         <ambientLight intensity={0.25} />
         <directionalLight position={[2, 3, 4]} intensity={1.1} color="#ffffff" />
