@@ -45,7 +45,6 @@ export function Terminal({ expanded, onExpand }: { expanded: boolean; onExpand: 
   // only, so content growing beneath an already-scrolled-up reader doesn't
   // itself flip it — see the `entries` effect below.
   const nearBottomRef = useRef(true)
-  const wasExpandedRef = useRef(expanded)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)')
@@ -72,12 +71,6 @@ export function Terminal({ expanded, onExpand }: { expanded: boolean; onExpand: 
     if (nearBottomRef.current) el.scrollTop = el.scrollHeight
     el.toggleAttribute('data-lenis-prevent', el.scrollHeight > el.clientHeight)
   }, [entries])
-
-  // return focus to the input when the sheet closes (button, Escape, or back)
-  useEffect(() => {
-    if (wasExpandedRef.current && !expanded) inputRef.current?.focus()
-    wasExpandedRef.current = expanded
-  }, [expanded])
 
   const append = (entry: Omit<Entry, 'id'>) =>
     setEntries((prev) => [...prev, { ...entry, id: nextId++ } as Entry])

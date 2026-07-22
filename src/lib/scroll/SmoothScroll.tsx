@@ -11,6 +11,28 @@ gsap.registerPlugin(ScrollTrigger)
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const reducedMotion = usePrefersReducedMotion()
 
+  // Keep ScrollTrigger's cached start/end offsets in sync with content height.
+  // GSAP only auto-refreshes on window resize/load — an in-page layout shift
+  // (expanding a project row, the chat sheet, images settling) leaves every
+  // trigger below it measuring against stale positions, so the heading scramble
+  // fires at the wrong scroll point. Refresh on any body resize, coalesced to
+  // one call per frame so the 0.45s row transition stays cheap and self-corrects
+  // at the end. Runs on touch too (kept out of the Lenis effect, which early-
+  // returns before cleanup on non-capable devices and would leak this observer).
+  useEffect(() => {
+    if (reducedMotion) return
+    let rafId = 0
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => ScrollTrigger.refresh())
+    })
+    ro.observe(document.body)
+    return () => {
+      cancelAnimationFrame(rafId)
+      ro.disconnect()
+    }
+  }, [reducedMotion])
+
   useEffect(() => {
     // Coarse-pointer/no-hover devices (touch) skip Lenis entirely — ScrollTrigger
     // falls back to native scroll by default when no scrollerProxy/ticker is wired up.
