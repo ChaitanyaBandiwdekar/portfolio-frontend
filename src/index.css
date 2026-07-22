@@ -32,13 +32,13 @@
   --font-body: 'Schibsted Grotesk Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  --text-display: clamp(2.5rem, 1.2rem + 5.5vw, 5.5rem);
+  --text-display: clamp(2rem, 0.48rem + 6.48vw, 5.5rem);
   --text-display--line-height: 1.1;
   --text-display--letter-spacing: -0.02em;
-  --text-h2: clamp(1.75rem, 1rem + 2.8vw, 3rem);
+  --text-h2: clamp(1.5rem, 0.85rem + 2.78vw, 3rem);
   --text-h2--line-height: 1.2;
   --text-h2--letter-spacing: -0.01em;
-  --text-h3: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+  --text-h3: clamp(1.125rem, 0.825rem + 1.28vw, 1.625rem);
   --text-h3--line-height: 1.35;
   --text-body: 1.0625rem;
   --text-body--line-height: 1.75;
@@ -60,6 +60,11 @@
   --container: 72rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
 
+  /* Mobile vertical-rhythm tokens */
+  --space-block-top: clamp(3.5rem, 1.5rem + 8.5vw, 6rem);
+  --space-block-bottom: clamp(2.5rem, 1rem + 6.4vw, 4rem);
+  --space-heading: clamp(1.25rem, 0.6rem + 2.7vw, 2rem);
+
   /* Semantic z-index scale */
   --z-canvas: -1;
   --z-base: 0;
@@ -74,6 +79,13 @@
 @media (max-width: 640px) {
   :root {
     --text-mono-sm: 0.875rem;
+    --text-body--line-height: 1.6;
+    --text-small--line-height: 1.55;
+    --text-mono--line-height: 1.6;
+  }
+
+  h1, h2 {
+    letter-spacing: -0.03em;
   }
 }
 
@@ -104,6 +116,9 @@
   h1, h2, h3 {
     font-family: var(--font-display);
     text-wrap: balance;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 
   ::selection {
