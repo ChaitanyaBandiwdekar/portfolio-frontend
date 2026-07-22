@@ -134,7 +134,7 @@ export function ChatSection() {
         }
         style={expanded ? { zIndex: 'var(--z-modal)' } : undefined}
       >
-        <TerminalWindow title="chaitbot:~zsh:80x24">
+        <TerminalWindow title="chaitbot:~zsh:80x24" hideTitlebar={expanded}>
           <div
             className={
               expanded
