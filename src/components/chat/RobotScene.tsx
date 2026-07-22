@@ -9,7 +9,7 @@ import { MoodBadge } from './MoodBadge'
 
 gsap.registerPlugin(ScrollTrigger) // idempotent
 
-export function RobotScene() {
+export function RobotScene({ hideBadge = false }: { hideBadge?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(false)
   const reducedMotion = usePrefersReducedMotion()
@@ -138,7 +138,8 @@ export function RobotScene() {
         <pointLight position={[-3, 1, -2]} intensity={14} color="#c2185b" />
         <Robot reducedMotion={reducedMotion} />
       </Canvas>
-      <MoodBadge />
+      {/* illegible at the ~44px sheet-header avatar size */}
+      {!hideBadge && <MoodBadge />}
     </div>
   )
 }

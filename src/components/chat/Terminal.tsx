@@ -24,7 +24,7 @@ const SUGGESTIONS = ['tell me about your work', 'what is your favourite food and
 
 let nextId = 1
 
-export function Terminal() {
+export function Terminal({ expanded, onExpand }: { expanded: boolean; onExpand: () => void }) {
   const [entries, setEntries] = useState<Entry[]>(GREETING)
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -40,6 +40,12 @@ export function Terminal() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const reducedMotion = usePrefersReducedMotion()
+  // Was the transcript scrolled near the bottom the last time the user (or an
+  // earlier auto-scroll) positioned it there? Updated on real scroll events
+  // only, so content growing beneath an already-scrolled-up reader doesn't
+  // itself flip it — see the `entries` effect below.
+  const nearBottomRef = useRef(true)
+  const wasExpandedRef = useRef(expanded)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)')
@@ -51,9 +57,27 @@ export function Terminal() {
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    el.scrollTop = el.scrollHeight
+    const onScroll = () => {
+      nearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
+    }
+    el.addEventListener('scroll', onScroll)
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    // only follow the stream down if the reader was already at the bottom —
+    // otherwise a mid-stream scroll-up gets yanked back on every token
+    if (nearBottomRef.current) el.scrollTop = el.scrollHeight
     el.toggleAttribute('data-lenis-prevent', el.scrollHeight > el.clientHeight)
   }, [entries])
+
+  // return focus to the input when the sheet closes (button, Escape, or back)
+  useEffect(() => {
+    if (wasExpandedRef.current && !expanded) inputRef.current?.focus()
+    wasExpandedRef.current = expanded
+  }, [expanded])
 
   const append = (entry: Omit<Entry, 'id'>) =>
     setEntries((prev) => [...prev, { ...entry, id: nextId++ } as Entry])
@@ -126,15 +150,21 @@ export function Terminal() {
   const hasSubmitted = entries.some((entry) => entry.kind === 'input')
 
   return (
-    // click anywhere in the pane focuses the input, like a real chat window;
+    // click anywhere in the pane focuses the input, like a real chat window
+    // (desktop only — below lg a tap in the transcript shouldn't pop the sheet open);
     // keyboard users reach the input directly via Tab, so no key handler needed here
-    <div className="flex min-w-0 flex-col lg:contain-size" onClick={() => inputRef.current?.focus()}>
+    <div
+      className={`flex min-w-0 flex-col lg:contain-size ${expanded ? 'min-h-0 flex-1 overflow-hidden' : ''}`}
+      onClick={() => {
+        if (window.matchMedia('(min-width: 1024px)').matches) inputRef.current?.focus()
+      }}
+    >
       <div
         ref={scrollRef}
         role="log"
         aria-live="polite"
         aria-label="Chat transcript"
-        className="space-y-3 overflow-y-auto overscroll-contain px-4 py-3 max-lg:h-[clamp(18rem,42dvh,30rem)] lg:min-h-0 lg:flex-1"
+        className={`space-y-4 overflow-y-auto overscroll-contain px-4 py-4 ${expanded ? 'min-h-0 flex-1' : 'max-lg:h-[clamp(12rem,30dvh,20rem)]'} lg:min-h-0 lg:flex-1`}
       >
         {entries.map((entry) => (
           <div key={entry.id}>
@@ -142,11 +172,11 @@ export function Terminal() {
               <div className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="flex size-7 shrink-0 items-center justify-center rounded border border-line font-mono text-mono-sm text-muted"
+                  className="hidden size-7 shrink-0 items-center justify-center rounded border border-line font-mono text-mono-sm text-muted lg:flex"
                 >
                   cb
                 </span>
-                <div className="max-w-[60ch] rounded border border-line bg-surface-2/60 px-3 py-2">
+                <div className="rounded border border-line bg-surface-2/60 px-3.5 py-2.5 lg:max-w-[60ch]">
                   <p
                     className={`whitespace-pre-wrap break-words text-ink ${entry.streaming && entry.text ? 'cursor-blink' : ''}`}
                   >
@@ -172,7 +202,7 @@ export function Terminal() {
               </div>
             )}
             {entry.kind === 'input' && (
-              <p className="whitespace-pre-wrap break-words text-right font-mono text-mono">
+              <p className="whitespace-pre-wrap break-words pl-8 text-right font-mono text-mono">
                 <span className="text-muted">you ❯ </span>
                 <span className="text-ink">{entry.text}</span>
               </p>
@@ -185,14 +215,14 @@ export function Terminal() {
           </div>
         ))}
         {!hasSubmitted && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
                 disabled={busy}
                 onClick={() => void submit(suggestion)}
-                className="rounded border border-line px-3 py-1.5 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50 max-lg:flex max-lg:min-h-11 max-lg:items-center"
+                className="w-full rounded border border-line px-3 py-1.5 font-mono text-mono-sm text-muted hover:bg-surface-2 disabled:opacity-50 max-lg:flex max-lg:min-h-11 max-lg:items-center sm:w-auto"
               >
                 {suggestion}
               </button>
@@ -201,7 +231,8 @@ export function Terminal() {
         )}
       </div>
       <form
-        className="flex items-center gap-2 border-t border-line px-4 py-3"
+        className="flex shrink-0 items-center gap-2 border-t border-line px-4 py-3"
+        style={expanded ? { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' } : undefined}
         onSubmit={(e) => {
           e.preventDefault()
           void submit()
@@ -222,6 +253,9 @@ export function Terminal() {
           }}
           onPointerEnter={() => setInputHovered(true)}
           onPointerLeave={() => setInputHovered(false)}
+          onFocus={() => {
+            if (window.matchMedia('(max-width: 1023px)').matches) onExpand()
+          }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowUp' && history.length > 0) {
               e.preventDefault()
