@@ -15,19 +15,19 @@ Depends on Phases 1–2. **Splittable into two parallel agents** (disjoint files
 **Files:** `src/components/hero/Hero.tsx`, `src/components/sections/About.tsx`,
 `src/components/layout/Footer.tsx`
 
-- [ ] **`Hero.tsx`** — no image work (confirmed text-only). With `--text-display` now flooring at
+- [x] **`Hero.tsx`** — no image work (confirmed text-only). With `--text-display` now flooring at
       32px, verify `Chaitanya Bandiwdekar` sits on two lines with `max-w-[14ch]` and never breaks
       inside `Bandiwdekar`. Check the `scroll ↓` cue at `bottom-5` (`Hero.tsx:101`) still clears the
       home indicator at 390×844; if not, use `bottom-[max(1.25rem,env(safe-area-inset-bottom))]`.
       (Phase 2 already added `scroll-mt` to `#hero` — do not duplicate.)
 
-- [ ] **`About.tsx`** — the `<dl>` at line 18 uses `justify-between` with the value right-aligned. At
+- [x] **`About.tsx`** — the `<dl>` at line 18 uses `justify-between` with the value right-aligned. At
       360px `Tomorrow's problem (jk, assign me that jira)` wraps into a ragged right-aligned block
       that's hard to read. Below `sm`, stack each fact: key on its own line in `text-muted`, value
       **left**-aligned beneath it. Keep the current two-column (`justify-between`, right-aligned)
       behaviour from `sm` up.
 
-- [ ] **`Footer.tsx`** — align to the new rhythm: `py-16` (line 16) → `pt-[var(--space-block-top)]
+- [x] **`Footer.tsx`** — align to the new rhythm: `py-16` (line 16) → `pt-[var(--space-block-top)]
       pb-[var(--space-block-bottom)] md:py-16`, and `mt-14` on the copyright `<p>` (line 60) →
       `mt-[var(--space-block-bottom)] md:mt-14`. (Phase 2 already added `scroll-mt` to `#contact` —
       do not duplicate.)
@@ -37,19 +37,19 @@ Depends on Phases 1–2. **Splittable into two parallel agents** (disjoint files
 **Files:** `src/components/sections/Projects.tsx`, `src/components/sections/Experience.tsx`,
 `src/components/sections/Stack.tsx`
 
-- [ ] **`Projects.tsx`** — `autonomous-code-coverage-engine` is 31 chars; at `text-mono` (15px) it
+- [x] **`Projects.tsx`** — `autonomous-code-coverage-engine` is 31 chars; at `text-mono` (15px) it
       needs ~280px but the mobile grid gives it ~264px after the year column. Below `sm`: drop the
       slug to `text-mono-sm`, and move `{project.year}` (line 37) onto the same row as the slug
       rather than a separate grid column, so the slug gets the full width. The slug should wrap at
       its own hyphens (Phase 1 already stopped arbitrary mid-word breaks). Confirm the expanded
       panel's `pb-6` reads as connected to its row and not to the next row.
 
-- [ ] **`Experience.tsx`** — `space-y-12` (48px, line 10) between roles is close to the
+- [x] **`Experience.tsx`** — `space-y-12` (48px, line 10) between roles is close to the
       *between-section* rhythm and flattens the hierarchy. Reduce to `space-y-8 sm:space-y-12`. Check
       the commit dot's `-left-[27px]` (line 16) still centres on the border line after any padding
       change.
 
-- [ ] **`Stack.tsx`** — the biggest content bug. The `<pre>` (line 14) uses
+- [x] **`Stack.tsx`** — the biggest content bug. The `<pre>` (line 14) uses
       `max-md:whitespace-pre-wrap max-md:break-words`, so a line like
       `"React", "TypeScript", "Tailwind CSS"` soft-wraps and destroys the JSON indentation, which was
       the entire point of the motif. **Below `md`, render one entry per line** (each on its own

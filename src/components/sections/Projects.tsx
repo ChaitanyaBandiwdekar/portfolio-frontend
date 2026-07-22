@@ -21,20 +21,25 @@ export function Projects() {
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : project.slug)}
-                className="grid w-full grid-cols-[auto_1fr_auto] items-baseline gap-x-4 py-4 text-left font-mono text-mono transition-colors hover:bg-surface max-sm:grid-cols-[1fr_auto]"
+                className="grid w-full grid-cols-[auto_1fr_auto] items-baseline gap-x-4 py-4 text-left font-mono text-mono transition-colors hover:bg-surface max-sm:grid-cols-1"
               >
                 <span aria-hidden="true" className="text-muted max-sm:hidden">
                   {project.perms}
                 </span>
                 <span>
-                  <span className={isOpen ? 'text-primary-bright' : 'text-ink'}>
+                  <span
+                    className={`${isOpen ? 'text-primary-bright' : 'text-ink'} max-sm:text-mono-sm`}
+                  >
                     {project.slug}/
+                  </span>
+                  <span className="ml-3 hidden text-mono-sm text-muted max-sm:inline">
+                    {project.year}
                   </span>
                   <span className="ml-3 text-muted max-sm:block max-sm:ml-0 max-sm:mt-1 max-sm:text-mono-sm">
                     {project.summary}
                   </span>
                 </span>
-                <span className="text-mono-sm text-muted">{project.year}</span>
+                <span className="text-mono-sm text-muted max-sm:hidden">{project.year}</span>
               </button>
               <div className="expandable" data-open={isOpen}>
                 <div>

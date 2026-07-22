@@ -13,7 +13,7 @@ export function Footer() {
   const year = new Date().getFullYear()
   return (
     <footer id="contact" className="border-t border-line scroll-mt-[var(--nav-h,4rem)]">
-      <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] py-16">
+      <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] pt-[var(--space-block-top)] pb-[var(--space-block-bottom)] md:py-16">
         <h3 className="font-display text-h3 font-semibold text-ink">ping me</h3>
         <p className="mt-3 max-w-[46ch] text-body text-muted">
           If the AI above didn't answer it, I probably can.
@@ -57,7 +57,7 @@ export function Footer() {
             </a>
           </li>
         </ul>
-        <p className="mt-14 font-mono text-mono-sm text-muted">
+        <p className="mt-[var(--space-block-bottom)] font-mono text-mono-sm text-muted md:mt-14">
           © {year} {site.name} · process exited with code 0
         </p>
       </div>

@@ -7,7 +7,10 @@ export function Experience() {
   useReveal(ref)
 
   return (
-    <ol ref={ref} className="relative ml-1 space-y-12 border-l border-line pl-5 sm:ml-2 sm:pl-8">
+    <ol
+      ref={ref}
+      className="relative ml-1 space-y-8 border-l border-line pl-5 sm:ml-2 sm:space-y-12 sm:pl-8"
+    >
       {experience.map((role) => (
         <li key={role.hash} data-reveal className="relative">
           {/* commit dot on the line */}

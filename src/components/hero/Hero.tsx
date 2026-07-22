@@ -102,7 +102,9 @@ export function Hero() {
         data-hero-reveal
         // py-3 grows the tap target to a ≥44px hit area; bottom-5 (bottom-8 minus
         // that same 12px) keeps the visible text at its original optical position.
-        className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 py-3 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
+        // bottom-[max(...)] clears the home-indicator safe area on notched phones;
+        // it's a no-op where the inset is 0.
+        className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 z-10 -translate-x-1/2 py-3 font-mono text-mono-sm text-muted hover:text-primary-bright motion-safe:animate-bounce-slow"
       >
         scroll ↓
       </a>

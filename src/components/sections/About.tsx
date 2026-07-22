@@ -17,9 +17,12 @@ export function About() {
       </div>
       <dl data-reveal className="h-fit space-y-3 border-t border-line pt-6 font-mono text-mono-sm lg:mt-2">
         {about.facts.map((fact) => (
-          <div key={fact.key} className="flex flex-wrap justify-between gap-x-6 gap-y-1">
+          <div key={fact.key} className="flex flex-col gap-y-1 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-6">
             <dt className="text-muted">{fact.key}</dt>
-            <dd className="ml-auto max-w-none text-right text-ink sm:max-w-[30ch]" style={{ textWrap: 'pretty' }}>
+            <dd
+              className="text-left text-ink sm:ml-auto sm:max-w-[30ch] sm:text-right"
+              style={{ textWrap: 'pretty' }}
+            >
               {fact.value}
             </dd>
           </div>
