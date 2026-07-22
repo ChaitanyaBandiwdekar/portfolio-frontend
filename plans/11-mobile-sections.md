@@ -13,7 +13,7 @@ Depends on Phase 1 (uses `--space-block-top`, `--space-block-bottom`, `--space-h
 **Files:** `src/components/layout/Section.tsx`, `src/App.tsx`, `src/components/hero/Hero.tsx`,
 `src/components/layout/Footer.tsx`
 
-- [ ] **Rewrite the `<section>` className** (`Section.tsx:65`) to use the new rhythm tokens and carry
+- [x] **Rewrite the `<section>` className** (`Section.tsx:65`) to use the new rhythm tokens and carry
       the full-bleed hairline on mobile only. Desktop keeps `min-h-svh` +
       `py-[calc(var(--space-section)/2)]` exactly as today. The hairline is `border-t border-line` on
       the section element (which uses padding, not margin, so it spans the viewport edge to edge);
@@ -27,17 +27,17 @@ Depends on Phase 1 (uses `--space-block-top`, `--space-block-bottom`, `--space-h
       md:min-h-svh md:border-t-0 md:py-[calc(var(--space-section)/2)]
       ```
 
-- [ ] **Add `scroll-mt` and confirm it works.** Lenis is deliberately disabled on touch devices
+- [x] **Add `scroll-mt` and confirm it works.** Lenis is deliberately disabled on touch devices
       (`SmoothScroll.tsx`), so mobile anchor jumps use native `scroll-behavior: smooth` and
       currently land *underneath* the fixed nav. `--nav-h` is already published by `Nav.tsx:29-39` —
       reuse it, do not hard-code. The `scroll-mt-[var(--nav-h,4rem)]` above covers every `<Section>`.
       Apply the same `scroll-mt-[var(--nav-h,4rem)]` to `#hero` (`Hero.tsx:52`) and `#contact`
       (`Footer.tsx:15`).
 
-- [ ] **Retune the heading margin** (`Section.tsx:70`): `mb-6 md:mb-12` →
+- [x] **Retune the heading margin** (`Section.tsx:70`): `mb-6 md:mb-12` →
       `mb-[var(--space-heading)] md:mb-12`.
 
-- [ ] **Add a `commandMobile` prop** to `SectionProps` (`Section.tsx:11-16`). Inside the existing
+- [x] **Add a `commandMobile` prop** to `SectionProps` (`Section.tsx:11-16`). Inside the existing
       `useGSAP` at `Section.tsx:23`, pick the string once when the timeline is built:
 
       ```ts
@@ -49,7 +49,7 @@ Depends on Phase 1 (uses `--space-block-top`, `--space-block-bottom`, `--space-h
       still resolves to the real `title`, and the `aria-label` still carries `title`. Remember to
       destructure `commandMobile` from props.
 
-- [ ] **Wire the mobile variants in `App.tsx:20-34`.** Only three sections need the prop:
+- [x] **Wire the mobile variants in `App.tsx:20-34`.** Only three sections need the prop:
       - chat: `commandMobile="./chat --bot"`
       - projects: `commandMobile="ls -la projects/"`
       - experience: `commandMobile="git log --work"`

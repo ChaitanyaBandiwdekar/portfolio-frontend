@@ -12,7 +12,7 @@ function shortLabel(url: string) {
 export function Footer() {
   const year = new Date().getFullYear()
   return (
-    <footer id="contact" className="border-t border-line">
+    <footer id="contact" className="border-t border-line scroll-mt-[var(--nav-h,4rem)]">
       <div className="mx-auto max-w-[var(--container)] px-[var(--gutter)] py-16">
         <h3 className="font-display text-h3 font-semibold text-ink">ping me</h3>
         <p className="mt-3 max-w-[46ch] text-body text-muted">

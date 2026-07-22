@@ -20,13 +20,28 @@ function App() {
         <Section id="about" title="A Bit About Me" command="about --me">
           <About />
         </Section>
-        <Section id="chat" title="Ask Me Anything" command="./chat --with robot">
+        <Section
+          id="chat"
+          title="Ask Me Anything"
+          command="./chat --with robot"
+          commandMobile="./chat --bot"
+        >
           <ChatSection />
         </Section>
-        <Section id="projects" title="What I've Built" command="ls -la ~/projects">
+        <Section
+          id="projects"
+          title="What I've Built"
+          command="ls -la ~/projects"
+          commandMobile="ls -la projects/"
+        >
           <Projects />
         </Section>
-        <Section id="experience" title="Experience" command="git log --experience">
+        <Section
+          id="experience"
+          title="Experience"
+          command="git log --experience"
+          commandMobile="git log --work"
+        >
           <Experience />
         </Section>
         <Section id="stack" title="Tech Stack" command="cat stack.json">

@@ -49,7 +49,11 @@ export function Hero() {
   )
 
   return (
-    <section id="hero" ref={rootRef} className="relative flex min-h-svh items-center overflow-hidden">
+    <section
+      id="hero"
+      ref={rootRef}
+      className="relative flex min-h-svh items-center overflow-hidden scroll-mt-[var(--nav-h,4rem)]"
+    >
       <BootIntro onDone={() => setBooted(true)} />
       <div ref={imageRef} data-hero-reveal aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
         {/* desktop only: full-bleed on the right, dissolving into the stage on its left edge.
